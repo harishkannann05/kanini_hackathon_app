@@ -1,0 +1,110 @@
+AI-Powered Smart Patient Triage Hackathon 
+Technology-Driven Innovation in Healthcare using AI & Data 
+ 
+ 
+Overview 
+Healthcare systems worldwide face increasing patient loads, limited medical resources, and 
+inefficiencies in early risk identification. Traditional triage processes rely heavily on manual 
+evaluation, leading to delays in identifying high-risk patients, overcrowded departments, 
+inconsistent prioritization, and increased operational strain. 
+Problem Statement 
+Design and develop an AI-based system that analyzes patient symptoms and basic medical 
+history to: 
+- Classify patients into risk levels (Low / Medium / High) 
+- Recommend the appropriate medical department 
+- Provide explainable insights behind predictions 
+- Support efficient patient prioritization and reduced wait times 
+Scope of the Solution 
+The system should include: 
+• 
+Patient Input Module (Age, Gender, Symptoms, Vitals, Pre-existing conditions) 
+• 
+Tool should able to load health document as input (EHR or EMR doc) 
+• 
+AI Risk Classification Engine (ML, Rule-based, or Hybrid) 
+• 
+Department Recommendation Engine (e.g., General Medicine, Cardiology, Emergency, 
+Neurology) 
+• 
+Explainability Layer (Contributing factors, confidence score) 
+• 
+Dashboard Interface (Risk summary, visualizations, department insights) 
+Data Guidelines 
+Participants will be provided with a standardized patient metadata schema. Teams must 
+generate synthetic data using a Synthetic Data Vault–like tool or equivalent framework. 
+Sample Metadata Fields 
+• 
+Patient_ID 
+• 
+Age 
+• 
+Gender 
+• 
+Symptoms 
+• 
+Blood Pressure 
+• 
+Heart Rate 
+• 
+Temperature 
+• 
+Pre-Existing Conditions 
+• 
+Risk_Level (optional for training) 
+ 
+ 
+32-Hour Hackathon Process 
+Phase 1 Ideation & Architecture 
+Understand the problem, define system architecture, plan data generation strategy, select 
+AI approach. 
+Phase 2 Model Development 
+Generate synthetic dataset, train and test AI model, build classification engine, implement 
+department mapping. 
+Phase 3 Integration & UI 
+Develop dashboard, integrate explainability module, simulate patient scenarios. 
+Phase 4 : Testing & Presentation 
+Validate model performance, test edge cases, prepare 5-minute demo and final 
+documentation. 
+Expected Deliverables 
+• 
+Working prototype (Web/App) 
+• 
+Source code repository 
+• 
+Architecture diagram 
+• 
+Dataset description and generation approach 
+• 
+Model performance metrics 
+• 
+Final presentation (5-minute demo + Q&A) 
+Evaluation Criteria 
+Criteria 
+Weightage 
+Innovation & Problem Understanding 
+15% 
+Technical Implementation 
+25% 
+AI Model Performance 
+20% 
+Explainability & Transparency 
+15% 
+UI/UX & Demonstration 
+15% 
+Scalability & Practical Applicability 
+10% 
+Innovation Bonus Areas ( NO need to share) 
+• 
+Real-time triage simulation 
+• 
+Voice-based symptom input 
+• 
+Bias & fairness analysis 
+• 
+Multilingual support 
+• 
+Integration with wearable device data 
+Outcome & Impact 
+Participants will gain hands-on experience in Applied AI in healthcare, synthetic data 
+generation, explainable AI systems, and building scalable prototypes that address real-
+world healthcare challenges. 

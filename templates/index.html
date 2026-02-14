@@ -1,44 +1,1223 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Patient Triage System</title>
+    <meta name="description"
+        content="AI-powered patient triage with SHAP explainability, risk classification, and real-time queue management.">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --bg-input: #1e293b;
+            --border: #1e3a5f;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── Navigation ──────────────────────────────── */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-brand svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-brand h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-input);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .nav-tab {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .nav-tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* ── Container ───────────────────────────────── */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Cards ────────────────────────────────────── */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-header .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .icon-blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .icon-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .icon-orange {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .icon-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .icon-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: #8b5cf6;
+        }
+
+        /* ── Form ─────────────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* ── Chip Select ──────────────────────────────── */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .chip.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .chip:hover {
+            border-color: var(--accent);
+        }
+
+        /* ── Buttons ──────────────────────────────────── */
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── Upload Area ──────────────────────────────── */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-area p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .upload-area .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        #file-list {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .file-tag {
+            padding: 4px 12px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        /* ── Result Panel ─────────────────────────────── */
+        .result-panel {
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+
+        .result-panel.visible {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .result-stat {
+            background: var(--bg-input);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .result-stat .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .result-stat .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .risk-high {
+            color: var(--danger);
+        }
+
+        .risk-medium {
+            color: var(--warning);
+        }
+
+        .risk-low {
+            color: var(--success);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .risk-badge.high {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .risk-badge.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .risk-badge.low {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        /* ── SHAP Chart ───────────────────────────────── */
+        .shap-chart-container {
+            max-width: 600px;
+            margin: 16px auto;
+        }
+
+        /* ── Dashboard Stats ──────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-card .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card .stat-info .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .stat-card .stat-info .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .chart-card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* ── Recent table ─────────────────────────────── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(30, 58, 95, 0.5);
+        }
+
+        .status-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .status-waiting {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .status-progress {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        /* ── Loading ──────────────────────────────────── */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Toast ────────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.85rem;
+            z-index: 1000;
+            animation: toastIn 0.3s;
+            max-width: 400px;
+        }
+
+        .toast-error {
+            background: var(--danger);
+        }
+
+        .toast-success {
+            background: var(--success);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
 <body>
 
-<h2>Patient Triage Test</h2>
+    <!-- ── Navigation ────────────────────────────────────────── -->
+    <nav class="nav">
+        <div class="nav-brand">
+            <svg viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="14" stroke="url(#g1)" stroke-width="2" />
+                <path d="M16 8v16M8 16h16" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" />
+                <defs>
+                    <linearGradient id="g1" x1="0" y1="0" x2="32" y2="32">
+                        <stop stop-color="#3b82f6" />
+                        <stop offset="1" stop-color="#8b5cf6" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1>AI Smart Triage</h1>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('intake')">🏥 Patient Intake</button>
+            <button class="nav-tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('doctors')">👨‍⚕️ Doctors</button>
+        </div>
+    </nav>
 
-<form id="triageForm">
-  Age: <input type="number" id="age"><br><br>
-  Systolic BP: <input type="number" id="bp"><br><br>
-  Heart Rate: <input type="number" id="hr"><br><br>
-  Temperature: <input type="number" step="0.1" id="temp"><br><br>
-  Symptoms (comma separated): <input type="text" id="symptoms"><br><br>
-  Chronic Conditions (comma separated): <input type="text" id="chronic"><br><br>
-  <button type="button" onclick="submitForm()">Predict</button>
-</form>
+    <div class="container">
 
-<h3 id="result"></h3>
+        <!-- ═══════ TAB 1: Patient Intake ═══════════════════ -->
+        <div id="tab-intake" class="tab-content active">
 
-<script>
-async function submitForm() {
-    const data = {
-        age: parseInt(document.getElementById("age").value),
-        gender: "Male",
-        systolic_bp: parseInt(document.getElementById("bp").value),
-        heart_rate: parseInt(document.getElementById("hr").value),
-        temperature: parseFloat(document.getElementById("temp").value),
-        symptoms: document.getElementById("symptoms").value.split(","),
-        chronic_conditions: document.getElementById("chronic").value.split(",")
-    };
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon icon-blue">🏥</div>
+                    <h2>Patient Information</h2>
+                </div>
+                <form id="intake-form" onsubmit="submitTriage(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="age" placeholder="e.g. 45" min="0" max="150" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="gender" required>
+                                <option value="">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Systolic BP (mmHg)</label>
+                            <input type="number" id="systolic_bp" placeholder="e.g. 130" min="50" max="300" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Heart Rate (bpm)</label>
+                            <input type="number" id="heart_rate" placeholder="e.g. 80" min="30" max="250" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Temperature (°C)</label>
+                            <input type="number" id="temperature" placeholder="e.g. 37.5" step="0.1" min="30" max="45"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Visit Type</label>
+                            <select id="visit_type">
+                                <option value="Walk-In">Walk-In</option>
+                                <option value="Online">Online</option>
+                            </select>
+                        </div>
+                    </div>
 
-    const response = await fetch("http://127.0.0.1:8000/predict", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
+                    <!-- Symptoms -->
+                    <div class="form-group" style="margin-top: 20px; grid-column: span 2;">
+                        <label>Symptoms (click to select)</label>
+                        <div class="chip-container" id="symptom-chips">
+                            <div class="chip" data-val="chest pain">Chest Pain</div>
+                            <div class="chip" data-val="shortness of breath">Shortness of Breath</div>
+                            <div class="chip" data-val="fever">Fever</div>
+                            <div class="chip" data-val="headache">Headache</div>
+                            <div class="chip" data-val="dizziness">Dizziness</div>
+                            <div class="chip" data-val="cough">Cough</div>
+                            <div class="chip" data-val="vomiting">Vomiting</div>
+                            <div class="chip" data-val="abdominal pain">Abdominal Pain</div>
+                            <div class="chip" data-val="palpitations">Palpitations</div>
+                            <div class="chip" data-val="weakness">Weakness</div>
+                            <div class="chip" data-val="numbness">Numbness</div>
+                            <div class="chip" data-val="diarrhea">Diarrhea</div>
+                        </div>
+                    </div>
 
-    const result = await response.json();
-    document.getElementById("result").innerText = 
-        "Risk Level: " + result.risk_level+"Risk probablity: "+result.stage1_probability;
-}
-</script>
+                    <!-- Chronic Conditions -->
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label>Pre-existing Conditions</label>
+                        <div class="chip-container" id="chronic-chips">
+                            <div class="chip" data-val="hypertension">Hypertension</div>
+                            <div class="chip" data-val="diabetes">Diabetes</div>
+                            <div class="chip" data-val="heart disease">Heart Disease</div>
+                            <div class="chip" data-val="asthma">Asthma</div>
+                            <div class="chip" data-val="chronic kidney disease">Chronic Kidney Disease</div>
+                        </div>
+                    </div>
+
+                    <!-- Document Upload -->
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Upload Health Document (EHR / EMR)</label>
+                        <div class="upload-area" id="upload-area"
+                            onclick="document.getElementById('file-input').click()">
+                            <div class="upload-icon">📄</div>
+                            <p>Click or drag & drop files here</p>
+                            <p style="font-size: 0.72rem; margin-top: 4px;">Supported: Images (JPG, PNG), PDF</p>
+                        </div>
+                        <input type="file" id="file-input" accept="image/*,.pdf" multiple style="display:none"
+                            onchange="handleFiles(this.files)">
+                        <div id="file-list"></div>
+                        <div id="ocr-results"
+                            style="display:none; margin-top: 10px; padding: 12px; background: var(--bg-input); border-radius: 8px;">
+                            <strong style="font-size: 0.8rem; color: var(--accent);">📋 Detected from document:</strong>
+                            <p id="ocr-text" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 6px;">
+                            </p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="margin-top: 24px;" id="submit-btn">
+                        🔬 Run AI Triage
+                    </button>
+                </form>
+            </div>
+
+            <!-- ── Result Panel ────────────────────────────── -->
+            <div class="result-panel" id="result-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon icon-purple">🎯</div>
+                        <h2>Triage Result</h2>
+                        <span id="risk-badge" class="risk-badge"></span>
+                    </div>
+
+                    <div class="result-grid" id="result-grid"></div>
+
+                    <!-- SHAP Explainability Chart -->
+                    <div class="card-header" style="margin-top: 8px;">
+                        <div class="icon icon-orange">🧠</div>
+                        <h2>AI Explanation — Contributing Factors</h2>
+                    </div>
+                    <div class="shap-chart-container">
+                        <canvas id="shap-chart"></canvas>
+                    </div>
+                    <p style="font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 8px;">
+                        SHAP values show how each feature contributed to the risk prediction. Positive = increases risk,
+                        Negative = decreases risk.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ TAB 2: Dashboard ═══════════════════════ -->
+        <div id="tab-dashboard" class="tab-content">
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-total">—</div>
+                        <div class="stat-label">Total Visits</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-red">🔴</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-high">—</div>
+                        <div class="stat-label">High Risk</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-orange">🟡</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-medium">—</div>
+                        <div class="stat-label">Medium Risk</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-green">🟢</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-low">—</div>
+                        <div class="stat-label">Low Risk</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-card">
+                    <h3>📈 Risk Distribution</h3>
+                    <canvas id="risk-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🏥 Department Load</h3>
+                    <canvas id="dept-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <div class="icon icon-blue">🕐</div>
+                    <h2>Recent Visits</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Visit ID</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Status</th>
+                            <th>Arrival</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══════ TAB 3: Doctors ═════════════════════════ -->
+        <div id="tab-doctors" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon icon-green">👨‍⚕️</div>
+                    <h2>Doctor Directory</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Specialization</th>
+                            <th>Department</th>
+                            <th>Experience</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctors-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ── Tab switching ───────────────────────────────
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tab === 'dashboard') loadDashboard();
+            if (tab === 'doctors') loadDoctors();
+        }
+
+        // ── Chip selection ──────────────────────────────
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => chip.classList.toggle('selected'));
+        });
+
+        function getSelectedChips(containerId) {
+            return Array.from(document.querySelectorAll('#' + containerId + ' .chip.selected'))
+                .map(c => c.dataset.val);
+        }
+
+        // ── File Upload ─────────────────────────────────
+        let uploadedFiles = [];
+
+        const uploadArea = document.getElementById('upload-area');
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        async function handleFiles(files) {
+            const fileList = document.getElementById('file-list');
+            for (const file of files) {
+                uploadedFiles.push(file);
+                const tag = document.createElement('div');
+                tag.className = 'file-tag';
+                tag.innerHTML = `📄 ${file.name} <span class="remove" onclick="removeFile(this, '${file.name}')">×</span>`;
+                fileList.appendChild(tag);
+
+                // Upload & OCR
+                const formData = new FormData();
+                formData.append('file', file);
+                try {
+                    const res = await fetch('/documents/upload', { method: 'POST', body: formData });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.detected_conditions) {
+                            const ocrDiv = document.getElementById('ocr-results');
+                            const ocrText = document.getElementById('ocr-text');
+                            const detected = [];
+                            if (data.detected_conditions.symptoms?.length) detected.push('Symptoms: ' + data.detected_conditions.symptoms.join(', '));
+                            if (data.detected_conditions.chronic_conditions?.length) detected.push('Conditions: ' + data.detected_conditions.chronic_conditions.join(', '));
+                            if (detected.length) {
+                                ocrDiv.style.display = 'block';
+                                ocrText.textContent = detected.join(' | ');
+                                // Auto-select matching chips
+                                data.detected_conditions.symptoms?.forEach(s => {
+                                    const chip = document.querySelector(`#symptom-chips .chip[data-val="${s}"]`);
+                                    if (chip) chip.classList.add('selected');
+                                });
+                                data.detected_conditions.chronic_conditions?.forEach(c => {
+                                    const chip = document.querySelector(`#chronic-chips .chip[data-val="${c}"]`);
+                                    if (chip) chip.classList.add('selected');
+                                });
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.log('OCR upload failed:', err);
+                }
+            }
+        }
+
+        function removeFile(el, name) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== name);
+            el.parentElement.remove();
+        }
+
+        // ── Submit Triage ───────────────────────────────
+        let shapChart = null;
+
+        async function submitTriage(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Processing...';
+
+            const payload = {
+                age: parseInt(document.getElementById('age').value),
+                gender: document.getElementById('gender').value,
+                systolic_bp: parseInt(document.getElementById('systolic_bp').value),
+                heart_rate: parseInt(document.getElementById('heart_rate').value),
+                temperature: parseFloat(document.getElementById('temperature').value),
+                symptoms: getSelectedChips('symptom-chips'),
+                chronic_conditions: getSelectedChips('chronic-chips'),
+                visit_type: document.getElementById('visit_type').value,
+                uploaded_documents: [],
+            };
+
+            try {
+                const res = await fetch('/visits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || `Server error: ${res.status}`);
+                }
+
+                const data = await res.json();
+                displayResult(data);
+                showToast('Triage complete!', 'success');
+            } catch (err) {
+                showToast(err.message || 'Network error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔬 Run AI Triage';
+            }
+        }
+
+        function displayResult(data) {
+            const panel = document.getElementById('result-panel');
+            panel.classList.add('visible');
+
+            // Risk badge
+            const badge = document.getElementById('risk-badge');
+            badge.textContent = data.risk_level;
+            badge.className = 'risk-badge ' + data.risk_level.toLowerCase();
+
+            // Stats grid
+            const grid = document.getElementById('result-grid');
+            grid.innerHTML = `
+            <div class="result-stat">
+                <div class="label">Risk Score</div>
+                <div class="value risk-${data.risk_level.toLowerCase()}">${data.risk_score}</div>
+            </div>
+            <div class="result-stat">
+                <div class="label">Confidence</div>
+                <div class="value">${(data.confidence * 100).toFixed(1)}%</div>
+            </div>
+            <div class="result-stat">
+                <div class="label">Department</div>
+                <div class="value" style="font-size: 1rem;">${data.department}</div>
+            </div>
+            <div class="result-stat">
+                <div class="label">Queue Position</div>
+                <div class="value">#${data.queue_position || '—'}</div>
+            </div>
+            <div class="result-stat">
+                <div class="label">Wait Time</div>
+                <div class="value">${data.estimated_wait_minutes ?? '—'} min</div>
+            </div>
+            <div class="result-stat">
+                <div class="label">Visit ID</div>
+                <div class="value" style="font-size: 0.65rem; word-break: break-all;">${data.visit_id}</div>
+            </div>
+        `;
+
+            // SHAP Chart
+            if (data.shap_explanation && data.shap_explanation.top_factors) {
+                renderShapChart(data.shap_explanation.top_factors);
+            }
+
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderShapChart(factors) {
+            if (shapChart) shapChart.destroy();
+
+            const ctx = document.getElementById('shap-chart').getContext('2d');
+            const labels = factors.map(f => f.feature.replace(/_/g, ' '));
+            const values = factors.map(f => f.contribution);
+            const colors = values.map(v => v >= 0 ? 'rgba(239, 68, 68, 0.8)' : 'rgba(16, 185, 129, 0.8)');
+            const borderColors = values.map(v => v >= 0 ? '#ef4444' : '#10b981');
+
+            shapChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'SHAP Contribution',
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: borderColors,
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `Contribution: ${ctx.parsed.x.toFixed(4)}`,
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'SHAP Value (impact on risk)', color: '#94a3b8' },
+                            grid: { color: 'rgba(30,58,95,0.3)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#f1f5f9', font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ── Dashboard ───────────────────────────────────
+        let riskChart = null, deptChart = null;
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch('/stats');
+                if (!res.ok) throw new Error('Failed to load stats');
+                const data = await res.json();
+
+                // Stats
+                document.getElementById('stat-total').textContent = data.total_visits;
+                document.getElementById('stat-high').textContent = data.risk_distribution?.High || 0;
+                document.getElementById('stat-medium').textContent = data.risk_distribution?.Medium || 0;
+                document.getElementById('stat-low').textContent = data.risk_distribution?.Low || 0;
+
+                // Risk distribution chart
+                if (riskChart) riskChart.destroy();
+                const riskCtx = document.getElementById('risk-chart').getContext('2d');
+                riskChart = new Chart(riskCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['High', 'Medium', 'Low'],
+                        datasets: [{
+                            data: [
+                                data.risk_distribution?.High || 0,
+                                data.risk_distribution?.Medium || 0,
+                                data.risk_distribution?.Low || 0
+                            ],
+                            backgroundColor: ['rgba(239,68,68,0.8)', 'rgba(245,158,11,0.8)', 'rgba(16,185,129,0.8)'],
+                            borderColor: ['#ef4444', '#f59e0b', '#10b981'],
+                            borderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: '#f1f5f9' } }
+                        }
+                    }
+                });
+
+                // Department load chart
+                if (deptChart) deptChart.destroy();
+                const deptCtx = document.getElementById('dept-chart').getContext('2d');
+                const deptLabels = Object.keys(data.department_load || {});
+                const deptValues = Object.values(data.department_load || {});
+                deptChart = new Chart(deptCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: deptLabels,
+                        datasets: [{
+                            label: 'Active Queue',
+                            data: deptValues,
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(30,58,95,0.3)' } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(30,58,95,0.3)' }, beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Recent visits
+                const tbody = document.getElementById('recent-table');
+                tbody.innerHTML = (data.recent_visits || []).map(v => {
+                    const statusClass = v.status === 'Completed' ? 'status-completed' :
+                        v.status === 'In Progress' ? 'status-progress' : 'status-waiting';
+                    return `<tr>
+                    <td style="font-size:0.72rem">${v.visit_id?.slice(0, 8)}...</td>
+                    <td>${v.age}</td>
+                    <td>${v.gender}</td>
+                    <td><span class="status-badge ${statusClass}">${v.status || 'Waiting'}</span></td>
+                    <td style="font-size:0.78rem">${v.arrival_time ? new Date(v.arrival_time).toLocaleString() : '—'}</td>
+                </tr>`;
+                }).join('');
+            } catch (err) {
+                showToast('Failed to load dashboard: ' + err.message, 'error');
+            }
+        }
+
+        // ── Doctors ─────────────────────────────────────
+        async function loadDoctors() {
+            try {
+                const res = await fetch('/doctors');
+                if (!res.ok) throw new Error('Failed to load doctors');
+                const data = await res.json();
+
+                const tbody = document.getElementById('doctors-table');
+                tbody.innerHTML = data.map(d => `
+                <tr>
+                    <td>${d.specialization || '—'}</td>
+                    <td>${d.department_name || '—'}</td>
+                    <td>${d.experience_years ?? '—'} yrs</td>
+                    <td><span class="status-badge ${d.is_available ? 'status-completed' : 'status-waiting'}">${d.is_available ? 'Available' : 'Busy'}</span></td>
+                </tr>
+            `).join('');
+            } catch (err) {
+                showToast('Failed to load doctors: ' + err.message, 'error');
+            }
+        }
+
+        // ── Toast ───────────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
 
 </body>
+
 </html>
