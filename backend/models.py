@@ -175,3 +175,86 @@ class User(Base):
     role: Mapped[str] = mapped_column(String, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
+
+
+# ── Reference Tables from dataset2 ─────────────────────────────────────────
+class DiseasePriority(Base):
+    __tablename__ = "disease_priority"
+
+    condition_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    condition_name: Mapped[str] = mapped_column(String)
+    condition_category: Mapped[str] = mapped_column(String, nullable=True)
+    base_severity_score: Mapped[int] = mapped_column(Integer, nullable=True)
+    default_department: Mapped[str] = mapped_column(String, nullable=True)
+    emergency_flag: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    contagious_flag: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    max_recommended_wait_minutes: Mapped[int] = mapped_column(Integer, nullable=True)
+    mortality_risk_level: Mapped[str] = mapped_column(String, nullable=True)
+    progression_speed: Mapped[str] = mapped_column(String, nullable=True)
+
+
+class SymptomSeverity(Base):
+    __tablename__ = "symptom_severity"
+
+    symptom_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    symptom_name: Mapped[str] = mapped_column(String)
+    base_severity: Mapped[int] = mapped_column(Integer, nullable=True)
+    emergency_trigger: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    associated_department: Mapped[str] = mapped_column(String, nullable=True)
+    possible_linked_conditions: Mapped[str] = mapped_column(Text, nullable=True)
+    typical_duration_days: Mapped[int] = mapped_column(Integer, nullable=True)
+
+
+class VitalSignReference(Base):
+    __tablename__ = "vital_signs_reference"
+
+    vital_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    vital_type: Mapped[str] = mapped_column(String)
+    age_group: Mapped[str] = mapped_column(String, nullable=True)
+    condition_modifier: Mapped[str] = mapped_column(String, nullable=True)
+    critical_low_threshold: Mapped[float] = mapped_column(Float, nullable=True)
+    critical_high_threshold: Mapped[float] = mapped_column(Float, nullable=True)
+    moderate_low_threshold: Mapped[float] = mapped_column(Float, nullable=True)
+    moderate_high_threshold: Mapped[float] = mapped_column(Float, nullable=True)
+    critical_instability_score: Mapped[int] = mapped_column(Integer, nullable=True)
+    moderate_instability_score: Mapped[int] = mapped_column(Integer, nullable=True)
+
+
+class ChronicConditionModifier(Base):
+    __tablename__ = "chronic_condition_modifiers"
+
+    chronic_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    chronic_condition: Mapped[str] = mapped_column(String)
+    risk_modifier_score: Mapped[int] = mapped_column(Integer, nullable=True)
+    high_risk_with_symptoms: Mapped[str] = mapped_column(Text, nullable=True)
+    associated_department: Mapped[str] = mapped_column(String, nullable=True)
+    complication_risk_level: Mapped[str] = mapped_column(String, nullable=True)
+
+
+class DoctorSpecialization(Base):
+    __tablename__ = "doctor_specialization"
+
+    doctor_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    specialization: Mapped[str] = mapped_column(String, nullable=True)
+    subspecialty: Mapped[str] = mapped_column(String, nullable=True)
+    experience_years: Mapped[int] = mapped_column(Integer, nullable=True)
+    max_patients_per_hour: Mapped[int] = mapped_column(Integer, nullable=True)
+    critical_case_certified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    performance_score: Mapped[float] = mapped_column(Float, nullable=True)
+    preferred_case_types: Mapped[str] = mapped_column(Text, nullable=True)
+    consultation_fee: Mapped[float] = mapped_column(Float, nullable=True)
+    availability_hours_per_week: Mapped[int] = mapped_column(Integer, nullable=True)
+
+
+class FocusedPatientDataset(Base):
+    __tablename__ = "focused_patient_dataset"
+
+    patient_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    age: Mapped[int] = mapped_column(Integer, nullable=True)
+    gender: Mapped[str] = mapped_column(String, nullable=True)
+    symptoms: Mapped[str] = mapped_column(Text, nullable=True)
+    blood_pressure: Mapped[str] = mapped_column(String, nullable=True)
+    heart_rate: Mapped[int] = mapped_column(Integer, nullable=True)
+    temperature: Mapped[float] = mapped_column(Float, nullable=True)
+    pre_existing_conditions: Mapped[str] = mapped_column(Text, nullable=True)
+    risk_level: Mapped[str] = mapped_column(String, nullable=True)

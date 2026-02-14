@@ -24,6 +24,22 @@ SYMPTOM_DEPT_MAP = {
     "weakness": "General Medicine",
 }
 
+# Try to load dynamic mapping cache (created by scripts/import_datasets.py)
+try:
+    import json
+    from pathlib import Path
+    CACHE = Path(__file__).resolve().parents[1] / "data_cache.json"
+    if CACHE.exists():
+        with open(CACHE, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+            cached_map = data.get("symptom_to_department", {})
+            # merge: prefer dataset mapping
+            for k, v in cached_map.items():
+                if k and v:
+                    SYMPTOM_DEPT_MAP[k.lower().strip()] = v
+except Exception:
+    pass
+
 # Priority order for department selection
 DEPT_PRIORITY = ["Cardiology", "Neurology", "Pulmonology", "Gastroenterology", "General Medicine"]
 
