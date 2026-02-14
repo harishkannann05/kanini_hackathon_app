@@ -1,0 +1,118 @@
+.dashboard-page {
+    --background: #0a0e27;
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.summary-card {
+    --background: #1a1f3a;
+    border: 1px solid #2a2f4a;
+    border-radius: 16px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    border-color: #4c9aff;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0.5rem 0;
+}
+
+.stat-label {
+    color: #8b92b0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.high-risk-card {
+    border-top: 4px solid #ff4757;
+}
+
+.waiting-card {
+    border-top: 4px solid #ffa502;
+}
+
+.content-card {
+    --background: #1a1f3a;
+    border: 1px solid #2a2f4a;
+    border-radius: 16px;
+    margin: 0;
+}
+
+.card-title {
+    color: #ffffff !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+}
+
+.dark-list {
+    background: transparent !important;
+}
+
+.dark-item {
+    --background: transparent;
+    --color: #ffffff;
+    --border-color: #2a2f4a;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+}
+
+.dark-item h2 {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.dark-item p {
+    color: #8b92b0;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-bottom: 2rem;
+}
+
+.primary-btn {
+    --background: #4c9aff;
+    --color: #ffffff;
+    --border-radius: 8px;
+    --padding-start: 2rem;
+    --padding-end: 2rem;
+    height: 3rem;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.secondary-btn {
+    --color: #ffffff;
+    --border-color: #2a2f4a;
+    --border-radius: 8px;
+    --padding-start: 2rem;
+    --padding-end: 2rem;
+    height: 3rem;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #0a0e27;
+    color: #ffffff;
+    font-size: 1.25rem;
+}

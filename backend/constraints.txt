@@ -7,6 +7,5 @@
 [patients] patients_heart_rate_check: CHECK ((heart_rate > 0))
 [patients] patients_risk_level_check: CHECK (((risk_level)::text = ANY ((ARRAY['Low'::character varying, 'Medium'::character varying, 'High'::character varying])::text[])))
 [patients] patients_temperature_check: CHECK (((temperature >= (30)::numeric) AND (temperature <= (45)::numeric)))
-[users] users_role_check: CHECK (((role)::text = ANY ((ARRAY['Admin'::character varying, 'Recipient'::character varying, 'Doctor'::character varying, 'Patient'::character varying])::text[])))
 [visits] visits_status_check: CHECK (((status)::text = ANY ((ARRAY['Waiting'::character varying, 'In Consultation'::character varying, 'Completed'::character varying, 'Cancelled'::character varying])::text[])))
 [visits] visits_visit_type_check: CHECK (((visit_type)::text = ANY ((ARRAY['Walk-In'::character varying, 'Online'::character varying])::text[])))

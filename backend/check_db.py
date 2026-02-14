@@ -12,14 +12,37 @@ HOST = os.getenv("host")
 PORT = os.getenv("port")
 DBNAME = os.getenv("dbname")
 
-encoded_user = urllib.parse.quote_plus(USER)
-encoded_password = urllib.parse.quote_plus(PASSWORD)
-DATABASE_URL = f"postgresql+asyncpg://{encoded_user}:{encoded_password}@{HOST}:{PORT}/{DBNAME}"
+# Development overrides
+DATABASE_URL_OVERRIDE = os.getenv("DATABASE_URL")
+USE_SQLITE = os.getenv("USE_SQLITE", "0") == "1"
 
-engine = create_async_engine(DATABASE_URL, echo=False, connect_args={"statement_cache_size": 0})
+if DATABASE_URL_OVERRIDE:
+    DATABASE_URL = DATABASE_URL_OVERRIDE
+elif USE_SQLITE:
+    DATABASE_URL = "sqlite+aiosqlite:///./backend_dev.db"
+else:
+    encoded_user = urllib.parse.quote_plus(USER or "")
+    encoded_password = urllib.parse.quote_plus(PASSWORD or "")
+    DATABASE_URL = f"postgresql+asyncpg://{encoded_user}:{encoded_password}@{HOST}:{PORT}/{DBNAME}"
+
+# Connect args for asyncpg
+connect_args = {}
+if DATABASE_URL.startswith("postgresql+asyncpg"):
+    connect_args = {"statement_cache_size": 0}
+
+engine = create_async_engine(DATABASE_URL, echo=False, connect_args=connect_args)
 
 async def check():
     async with engine.connect() as conn:
+        if DATABASE_URL.startswith("sqlite"):
+            # Simple sqlite connectivity check
+            r = await conn.execute(text("SELECT 1"))
+            with open("constraints.txt", "w") as f:
+                f.write("sqlite fallback — connectivity OK. No pg constraints to dump.\n")
+            print("SQLite connectivity OK. Wrote constraints.txt (note: pg-specific checks skipped).")
+            return
+
+        # Postgres-specific constraint dump
         r = await conn.execute(text("""
             SELECT c.conrelid::regclass AS table_name, c.conname, pg_get_constraintdef(c.oid)
             FROM pg_constraint c

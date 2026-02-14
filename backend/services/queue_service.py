@@ -7,6 +7,7 @@ from sqlalchemy import select, func, update
 from models import Queue, Doctor
 from datetime import datetime, timezone
 import uuid
+from services.ws_manager import notify_doctor_queue_update
 
 
 def compute_priority_score(risk_level: str, risk_score: int, is_emergency: bool) -> int:
@@ -72,6 +73,17 @@ async def insert_into_queue(
     )
     db.add(queue_entry)
     await db.flush()
+    # Notify any websocket subscribers for this doctor
+    try:
+        await notify_doctor_queue_update(doctor_id, {
+            "event": "queue_insert",
+            "visit_id": visit_id,
+            "queue_position": position,
+            "priority_score": priority,
+            "is_emergency": is_emergency,
+        })
+    except Exception:
+        pass
     return position
 
 

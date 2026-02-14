@@ -1,0 +1,1 @@
+sqlite fallback — connectivity OK. No pg constraints to dump.

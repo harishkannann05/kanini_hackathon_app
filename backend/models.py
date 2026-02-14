@@ -9,7 +9,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import JSON as JSON_TYPE
 import uuid
 from datetime import datetime
 
@@ -22,7 +22,7 @@ class Base(DeclarativeBase):
 class Patient(Base):
     __tablename__ = "patients"
 
-    patient_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    patient_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     age: Mapped[int] = mapped_column(Integer)
     gender: Mapped[str] = mapped_column(String)
     symptoms: Mapped[str] = mapped_column(Text)
@@ -38,7 +38,7 @@ class Patient(Base):
 class Department(Base):
     __tablename__ = "departments"
 
-    department_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    department_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
@@ -48,8 +48,8 @@ class Department(Base):
 class Visit(Base):
     __tablename__ = "visits"
 
-    visit_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    patient_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("patients.patient_id"), nullable=True)
+    visit_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    patient_id: Mapped[str] = mapped_column(String(36), ForeignKey("patients.patient_id"), nullable=True)
     visit_type: Mapped[str] = mapped_column(String, nullable=True)
     arrival_time: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
     status: Mapped[str] = mapped_column(String, default="Waiting", nullable=True)
@@ -62,12 +62,12 @@ class Visit(Base):
 class AIAssessment(Base):
     __tablename__ = "ai_assessments"
 
-    assessment_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    visit_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("visits.visit_id"), nullable=True)
+    assessment_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    visit_id: Mapped[str] = mapped_column(String(36), ForeignKey("visits.visit_id"), nullable=True)
     risk_score: Mapped[int] = mapped_column(Integer, nullable=True)
     risk_level: Mapped[str] = mapped_column(String, nullable=True)
-    recommended_department: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
-    shap_explanation: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    recommended_department: Mapped[str] = mapped_column(String(36), nullable=True)
+    shap_explanation: Mapped[dict] = mapped_column(JSON_TYPE, nullable=True)
     model_version: Mapped[str] = mapped_column(String, nullable=True)
     confidence_score: Mapped[float] = mapped_column(Numeric, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
@@ -77,9 +77,9 @@ class AIAssessment(Base):
 class Doctor(Base):
     __tablename__ = "doctors"
 
-    doctor_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
-    department_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
+    doctor_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), nullable=True)
+    department_id: Mapped[str] = mapped_column(String(36), nullable=True)
     specialization: Mapped[str] = mapped_column(String, nullable=True)
     experience_years: Mapped[int] = mapped_column(Integer, nullable=True)
     consultation_fee: Mapped[float] = mapped_column(Numeric, nullable=True)
@@ -92,10 +92,10 @@ class Doctor(Base):
 class DoctorAssignment(Base):
     __tablename__ = "doctor_assignments"
 
-    assignment_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    visit_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("visits.visit_id"), nullable=True)
-    doctor_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("doctors.doctor_id"), nullable=True)
-    assigned_by: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
+    assignment_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    visit_id: Mapped[str] = mapped_column(String(36), ForeignKey("visits.visit_id"), nullable=True)
+    doctor_id: Mapped[str] = mapped_column(String(36), ForeignKey("doctors.doctor_id"), nullable=True)
+    assigned_by: Mapped[str] = mapped_column(String(36), nullable=True)
     assigned_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=True)
 
@@ -104,9 +104,9 @@ class DoctorAssignment(Base):
 class Queue(Base):
     __tablename__ = "queue"
 
-    queue_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    visit_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("visits.visit_id"), nullable=True)
-    doctor_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("doctors.doctor_id"), nullable=True)
+    queue_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    visit_id: Mapped[str] = mapped_column(String(36), ForeignKey("visits.visit_id"), nullable=True)
+    doctor_id: Mapped[str] = mapped_column(String(36), ForeignKey("doctors.doctor_id"), nullable=True)
     priority_score: Mapped[int] = mapped_column(Integer)
     queue_position: Mapped[int] = mapped_column(Integer, nullable=True)
     waiting_time_minutes: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
@@ -118,9 +118,9 @@ class Queue(Base):
 class Document(Base):
     __tablename__ = "documents"
 
-    document_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    patient_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
-    visit_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("visits.visit_id"), nullable=True)
+    document_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    patient_id: Mapped[str] = mapped_column(String(36), nullable=True)
+    visit_id: Mapped[str] = mapped_column(String(36), ForeignKey("visits.visit_id"), nullable=True)
     file_url: Mapped[str] = mapped_column(Text)
     file_type: Mapped[str] = mapped_column(String, nullable=True)
     extracted_text: Mapped[str] = mapped_column(Text, nullable=True)
@@ -132,8 +132,8 @@ class Document(Base):
 class EmergencyAlert(Base):
     __tablename__ = "emergency_alerts"
 
-    alert_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    visit_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("visits.visit_id"), nullable=True)
+    alert_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    visit_id: Mapped[str] = mapped_column(String(36), ForeignKey("visits.visit_id"), nullable=True)
     triggered_by: Mapped[str] = mapped_column(String, nullable=True)
     alert_message: Mapped[str] = mapped_column(Text, nullable=True)
     resolved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
@@ -144,8 +144,8 @@ class EmergencyAlert(Base):
 class Notification(Base):
     __tablename__ = "notifications"
 
-    notification_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
+    notification_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), nullable=True)
     message: Mapped[str] = mapped_column(Text)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
@@ -155,10 +155,23 @@ class Notification(Base):
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 
-    log_id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
+    log_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), nullable=True)
     action: Mapped[str] = mapped_column(Text)
     target_table: Mapped[str] = mapped_column(String, nullable=True)
-    target_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=True)
+    target_id: Mapped[str] = mapped_column(String(36), nullable=True)
     ip_address: Mapped[str] = mapped_column(String, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)
+
+
+# ── Users (Authentication) ─────────────────────────────────────
+class User(Base):
+    __tablename__ = "users"
+
+    user_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    full_name: Mapped[str] = mapped_column(String, nullable=True)
+    email: Mapped[str] = mapped_column(String, nullable=True)
+    password_hash: Mapped[str] = mapped_column(Text, nullable=True)
+    role: Mapped[str] = mapped_column(String, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=True)

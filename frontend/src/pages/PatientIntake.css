@@ -1,0 +1,222 @@
+.patient-intake-page {
+    --background: #0a0e27;
+}
+
+.custom-toolbar {
+    --background: #0f1535;
+    --color: #ffffff;
+    padding: 0 2rem;
+}
+
+.custom-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-icon {
+    font-size: 1.8rem;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.nav-buttons ion-button {
+    --color: #8b92b0;
+    text-transform: none;
+    font-weight: 500;
+}
+
+.nav-buttons ion-button.active-nav {
+    --color: #4c9aff;
+    --background: rgba(76, 154, 255, 0.1);
+}
+
+.dark-content {
+    --background: #0a0e27;
+    --color: #ffffff;
+}
+
+.intake-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.section-icon {
+    font-size: 1.5rem;
+    color: #4c9aff;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    color: #8b92b0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.custom-input,
+.custom-select {
+    --background: #1a1f3a;
+    --color: #ffffff;
+    --placeholder-color: #4a5168;
+    --border-radius: 8px;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    border: 1px solid #2a2f4a;
+    border-radius: 8px;
+}
+
+.custom-input:focus,
+.custom-select:focus {
+    border-color: #4c9aff;
+}
+
+.section-label {
+    display: block;
+    color: #8b92b0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.symptoms-section,
+.conditions-section {
+    margin: 2rem 0;
+}
+
+.chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.chip-unselected {
+    --background: #1a1f3a;
+    --color: #8b92b0;
+    border: 1px solid #2a2f4a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip-unselected:hover {
+    --background: #252b4a;
+    --color: #ffffff;
+    border-color: #4c9aff;
+}
+
+.chip-selected {
+    --background: #4c9aff;
+    --color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip-selected ion-icon {
+    margin-left: 0.25rem;
+    cursor: pointer;
+}
+
+.upload-section {
+    margin: 2rem 0;
+}
+
+.upload-box {
+    background: #1a1f3a;
+    border: 2px dashed #2a2f4a;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+    border-color: #4c9aff;
+    background: #1f2540;
+}
+
+.upload-label {
+    cursor: pointer;
+    display: block;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #4c9aff;
+    margin-bottom: 1rem;
+}
+
+.upload-label p {
+    color: #ffffff;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.upload-label span {
+    color: #8b92b0;
+    font-size: 0.875rem;
+}
+
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #252b4a;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.uploaded-file span {
+    color: #ffffff;
+}
+
+.uploaded-file ion-icon {
+    color: #ff4757;
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+.submit-section {
+    margin-top: 2rem;
+}
+
+.run-triage-btn {
+    --background: #4c9aff;
+    --background-hover: #3a8aef;
+    --background-activated: #2a7adf;
+    --color: #ffffff;
+    --border-radius: 8px;
+    --padding-top: 1rem;
+    --padding-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: none;
+}

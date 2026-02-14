@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy>=2.0
+asyncpg
+aiosqlite
+python-dotenv
+pandas
+scikit-learn
+xgboost
+joblib
+pillow
+pytesseract
+shap
+aiofiles
+python-multipart
+PyJWT
+passlib[bcrypt]

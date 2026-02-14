@@ -19,6 +19,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from db import get_db
+from db import init_db, USE_SQLITE
 from models import (
     Patient, Visit, AIAssessment, DoctorAssignment,
     Queue, AuditLog, EmergencyAlert, Doctor, Department, Document
@@ -30,8 +31,38 @@ from services.queue_service import (
     insert_into_queue, estimate_wait_time, get_doctor_queue
 )
 from services.ocr_service import extract_text_from_file, detect_conditions, merge_ocr_with_payload
+from services.ws_manager import manager as ws_manager
+from services.auth_service import create_user, authenticate_user
+from pydantic import BaseModel
+from fastapi import Depends
+import jwt
+JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret")
+JWT_ALGO = "HS256"
+
+
+class AuthRegister(BaseModel):
+    full_name: str
+    email: str
+    password: str
+    role: str = "Recipient"
+
+
+class AuthLogin(BaseModel):
+    email: str
+    password: str
 
 app = FastAPI(title="AI Smart Patient Triage", version="2.0.0")
+
+
+@app.on_event("startup")
+async def startup_event():
+    # Initialize local sqlite DB for development if enabled
+    try:
+        await init_db()
+        if USE_SQLITE:
+            logger.info("Initialized local SQLite database for development.")
+    except Exception:
+        logger.exception("Failed to initialize development DB (this is non-fatal).")
 
 # ── CORS ───────────────────────────────────────────────────────
 app.add_middleware(
@@ -274,7 +305,21 @@ async def serve_queue_entry(queue_id: str, req: ServeRequest, db: AsyncSession =
             target_id=queue_id,
         )
         db.add(audit)
-
+        # notify websocket clients if this queue entry belonged to a doctor
+        try:
+            # load queue entry to find doctor_id
+            q_stmt = select(Queue).where(Queue.queue_id == queue_id)
+            qres = await db.execute(q_stmt)
+            qentry = qres.scalars().first()
+            if qentry and qentry.doctor_id:
+                await ws_manager.broadcast_to_doctor(str(qentry.doctor_id), {
+                    "event": f"queue_{req.action}",
+                    "queue_id": queue_id,
+                    "visit_id": str(qentry.visit_id),
+                    "action": req.action,
+                })
+        except Exception:
+            pass
     return {"status": "ok", "queue_id": queue_id, "action": req.action}
 
 
@@ -337,6 +382,27 @@ async def list_doctors(db: AsyncSession = Depends(get_db)):
         ]
 
 
+@app.websocket("/ws/doctor/{doctor_id}")
+async def websocket_doctor_queue(websocket, doctor_id: str):
+    """WebSocket endpoint for doctor-specific live queue updates."""
+    try:
+        await ws_manager.connect(doctor_id, websocket)
+        # upon connection, send a simple hello message
+        await websocket.send_json({"event": "connected", "doctor_id": doctor_id})
+        # keep the connection open and receive pings
+        while True:
+            data = await websocket.receive_text()
+            # ignore incoming messages; it's a keep-alive channel
+            await websocket.send_text('{"event":"ack"}')
+    except Exception:
+        pass
+    finally:
+        try:
+            await ws_manager.disconnect(doctor_id, websocket)
+        except Exception:
+            pass
+
+
 # ══════════════════════════════════════════════════════════════
 #  GET /stats — Dashboard statistics
 # ══════════════════════════════════════════════════════════════
@@ -390,3 +456,24 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
         "total_visits": total_visits,
         "recent_visits": recent,
     }
+
+
+# ── AUTH ENDPOINTS (simple JWT) ─────────────────────────────────
+@app.post("/auth/register")
+async def register_user(req: AuthRegister, db: AsyncSession = Depends(get_db)):
+    async with db.begin():
+        user = await create_user(db, req.full_name, req.email, req.password, req.role)
+    return {"status": "ok", **user}
+
+
+@app.post("/auth/login")
+async def login_user(req: AuthLogin, db: AsyncSession = Depends(get_db)):
+    auth = await authenticate_user(db, req.email, req.password)
+    if not auth:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return auth
+
+
+def get_current_user(token: str = Depends(lambda: None)):
+    # placeholder for dependency wiring in future; keep simple for now
+    return None
