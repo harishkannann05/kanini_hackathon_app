@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simple API Tester</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #eee;
+            border: 1px solid #999;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🏥 Simple API Tester</h1>
+
+    <div class="box">
+        <h3>1. Create Visit (POST /visits)</h3>
+        <form id="visitForm">
+            <label>Age: <input type="number" name="age" value="45"></label>
+            <label>Gender:
+                <select name="gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </label>
+            <label>Systolic BP: <input type="number" name="systolic_bp" value="140"></label>
+            <label>Heart Rate: <input type="number" name="heart_rate" value="95"></label>
+            <label>Temperature: <input type="number" name="temperature" value="37.5" step="0.1"></label>
+            <label>Symptoms (comma separate): <input type="text" name="symptoms"
+                    value="chest pain, shortness of breath"></label>
+            <label>Chronic Conditions (comma separate): <input type="text" name="chronic_conditions"
+                    value="hypertension"></label>
+            <button type="submit">Send Request</button>
+        </form>
+        <div id="visitResult"></div>
+    </div>
+
+    <div class="box">
+        <h3>2. Get Stats (GET /stats)</h3>
+        <button onclick="getStats()">Fetch Stats</button>
+        <pre id="statsResult"></pre>
+    </div>
+
+    <div class="box">
+        <h3>3. Get Doctors (GET /doctors)</h3>
+        <button onclick="getDoctors()">Fetch Doctors</button>
+        <pre id="doctorsResult"></pre>
+    </div>
+
+    <script>
+        document.getElementById('visitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const payload = {
+                age: parseInt(formData.get('age')),
+                gender: formData.get('gender'),
+                systolic_bp: parseInt(formData.get('systolic_bp')),
+                heart_rate: parseInt(formData.get('heart_rate')),
+                temperature: parseFloat(formData.get('temperature')),
+                symptoms: formData.get('symptoms').split(',').map(s => s.trim()).filter(s => s),
+                chronic_conditions: formData.get('chronic_conditions').split(',').map(s => s.trim()).filter(s => s),
+                visit_type: "Walk-In",
+                uploaded_documents: []
+            };
+
+            const resDiv = document.getElementById('visitResult');
+            resDiv.innerHTML = 'Sending...';
+
+            try {
+                const res = await fetch('/visits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                resDiv.innerHTML = `
+                    <p class="status ${res.ok ? 'success' : 'error'}">Status: ${res.status}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (err) {
+                resDiv.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+            }
+        });
+
+        async function getStats() {
+            const resDiv = document.getElementById('statsResult');
+            resDiv.textContent = 'Loading...';
+            try {
+                const res = await fetch('/stats');
+                const data = await res.json();
+                resDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resDiv.textContent = 'Error: ' + err.message;
+            }
+        }
+
+        async function getDoctors() {
+            const resDiv = document.getElementById('doctorsResult');
+            resDiv.textContent = 'Loading...';
+            try {
+                const res = await fetch('/doctors');
+                const data = await res.json();
+                resDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resDiv.textContent = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+
+</html>

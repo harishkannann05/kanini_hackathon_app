@@ -53,6 +53,11 @@ async def serve_ui():
     return FileResponse(os.path.join(TEMPLATES_DIR, "index.html"))
 
 
+@app.get("/test-ui")
+async def serve_test_ui():
+    return FileResponse(os.path.join(TEMPLATES_DIR, "simple_test.html"))
+
+
 # ══════════════════════════════════════════════════════════════
 #  POST /visits — Full Orchestration Endpoint
 # ══════════════════════════════════════════════════════════════
