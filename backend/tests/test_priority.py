@@ -1,4 +1,10 @@
 import pytest
+import sys
+from pathlib import Path
+
+# Add backend to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from services.queue_service import compute_priority_score
 
 

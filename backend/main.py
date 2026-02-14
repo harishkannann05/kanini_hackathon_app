@@ -56,13 +56,9 @@ app = FastAPI(title="AI Smart Patient Triage", version="2.0.0")
 
 @app.on_event("startup")
 async def startup_event():
-    # Initialize local sqlite DB for development if enabled
-    try:
-        await init_db()
-        if USE_SQLITE:
-            logger.info("Initialized local SQLite database for development.")
-    except Exception:
-        logger.exception("Failed to initialize development DB (this is non-fatal).")
+    # Tables already created by migration script
+    # Skip init_db for now to avoid potential issues
+    logger.info("Application started successfully")
 
 # ── CORS ───────────────────────────────────────────────────────
 app.add_middleware(

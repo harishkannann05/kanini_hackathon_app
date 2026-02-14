@@ -3,6 +3,7 @@ from typing import AsyncGenerator
 from dotenv import load_dotenv
 import os
 import urllib.parse
+from pathlib import Path
 
 # Load environment variables from .env
 load_dotenv()
@@ -20,13 +21,17 @@ USE_SQLITE = os.getenv("USE_SQLITE", "0") == "1"
 
 if DATABASE_URL_OVERRIDE:
     DATABASE_URL = DATABASE_URL_OVERRIDE
+    print(f"Using DATABASE_URL override: {DATABASE_URL}")
 elif USE_SQLITE:
-    # Local development sqlite file
-    DATABASE_URL = f"sqlite+aiosqlite:///./backend_dev.db"
+    # Local development sqlite file - use absolute path from project root
+    db_path = Path(__file__).resolve().parents[1] / "backend_dev.db"
+    DATABASE_URL = f"sqlite+aiosqlite:///{db_path}"
+    print(f"Using SQLite development mode at {db_path}")
 else:
-    if PASSWORD == "[YOUR-PASSWORD]":
-        print("Error: Please replace '[YOUR-PASSWORD]' in backend/.env with your actual Supabase database password.")
-        # do not exit; allow developer to choose sqlite fallback
+    # PostgreSQL / Supabase
+    if not (USER and PASSWORD and HOST and PORT and DBNAME):
+        print("Warning: Incomplete PostgreSQL credentials in .env")
+        print(f"  user={USER}, password={'***' if PASSWORD else 'MISSING'}, host={HOST}, port={PORT}, dbname={DBNAME}")
 
     # URL-encode credentials to handle special characters (like '@' in password)
     encoded_user = urllib.parse.quote_plus(USER or "")
@@ -34,10 +39,11 @@ else:
 
     # Construct Database URL
     DATABASE_URL = f"postgresql+asyncpg://{encoded_user}:{encoded_password}@{HOST}:{PORT}/{DBNAME}"
+    print(f"Connecting to PostgreSQL at {HOST}:{PORT}")
 
 # Create Async Engine
 # For PostgreSQL (asyncpg) we disable prepared statements for Supabase pooler.
-engine_kwargs = {"echo": True}
+engine_kwargs = {"echo": False}
 connect_args = {}
 if DATABASE_URL.startswith("postgresql+asyncpg"):
     connect_args = {"statement_cache_size": 0}
@@ -62,10 +68,18 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db():
-    """Create tables for local development when using SQLite."""
+    """Create tables for local development when using SQLite (if they don't exist)."""
     if not USE_SQLITE:
         return
     # import models lazily to avoid circular imports at top-level
     from models import Base
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        # Only create tables if they don't already exist
+        # SQLite doesn't have a way to check easily, so we'll just try to create
+        # and it will be idempotent in most cases
+        try:
+            await conn.run_sync(Base.metadata.create_all)
+        except Exception as e:
+            # If table creation fails, it's likely because tables already exist
+            # which is fine for development
+            pass

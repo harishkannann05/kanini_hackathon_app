@@ -23,6 +23,7 @@ from backend.models import (
 )
 
 async def import_table(df: pd.DataFrame, model_cls, mapping: dict, session):
+    """Import dataframe rows into table via ORM."""
     rows = []
     for _, r in df.iterrows():
         kwargs = {}
@@ -42,21 +43,17 @@ async def import_table(df: pd.DataFrame, model_cls, mapping: dict, session):
         rows.append(model_cls(**kwargs))
     if rows:
         session.add_all(rows)
+    return len(rows)
 
 
 async def run_import(force: bool = False):
+    """Import all CSV datasets into PostgreSQL."""
     async with AsyncSessionLocal() as session:
         async with session.begin():
-            # Skip if already populated (unless force)
-            existing = await session.execute("SELECT count(*) FROM disease_priority")
-            count = existing.scalar() or 0
-            if count > 0 and not force:
-                print("Datasets already imported (use force=True to re-import). Skipping.")
-                return
-
-            print("Importing datasets from dataset2/ ...")
+            print("Importing datasets from dataset2/ into PostgreSQL...")
 
             # 1. disease_priority
+            print("Importing disease_priority (1_disease_priority_10k.csv)...")
             df1 = pd.read_csv(DATA_DIR / "1_disease_priority_10k.csv")
             mapping1 = {
                 "Condition_ID": "condition_id",
@@ -70,9 +67,11 @@ async def run_import(force: bool = False):
                 "Mortality_Risk_Level": "mortality_risk_level",
                 "Progression_Speed": "progression_speed",
             }
-            await import_table(df1, DiseasePriority, mapping1, session)
+            count1 = await import_table(df1, DiseasePriority, mapping1, session)
+            print(f"  → Inserted {count1} rows into disease_priority")
 
             # 2. symptom_severity
+            print("Importing symptom_severity (2_symptom_severity_10k.csv)...")
             df2 = pd.read_csv(DATA_DIR / "2_symptom_severity_10k.csv")
             mapping2 = {
                 "Symptom_ID": "symptom_id",
@@ -83,9 +82,11 @@ async def run_import(force: bool = False):
                 "Possible_Linked_Conditions": "possible_linked_conditions",
                 "Typical_Duration_Days": "typical_duration_days",
             }
-            await import_table(df2, SymptomSeverity, mapping2, session)
+            count2 = await import_table(df2, SymptomSeverity, mapping2, session)
+            print(f"  → Inserted {count2} rows into symptom_severity")
 
             # 3. vital_signs_reference
+            print("Importing vital_signs_reference (3_vital_signs_reference_10k.csv)...")
             df3 = pd.read_csv(DATA_DIR / "3_vital_signs_reference_10k.csv")
             mapping3 = {
                 "Vital_ID": "vital_id",
@@ -99,9 +100,11 @@ async def run_import(force: bool = False):
                 "Critical_Instability_Score": "critical_instability_score",
                 "Moderate_Instability_Score": "moderate_instability_score",
             }
-            await import_table(df3, VitalSignReference, mapping3, session)
+            count3 = await import_table(df3, VitalSignReference, mapping3, session)
+            print(f"  → Inserted {count3} rows into vital_signs_reference")
 
             # 4. chronic_condition_modifiers
+            print("Importing chronic_condition_modifiers (4_chronic_condition_modifiers_10k.csv)...")
             df4 = pd.read_csv(DATA_DIR / "4_chronic_condition_modifiers_10k.csv")
             mapping4 = {
                 "Chronic_ID": "chronic_id",
@@ -111,9 +114,11 @@ async def run_import(force: bool = False):
                 "Associated_Department": "associated_department",
                 "Complication_Risk_Level": "complication_risk_level",
             }
-            await import_table(df4, ChronicConditionModifier, mapping4, session)
+            count4 = await import_table(df4, ChronicConditionModifier, mapping4, session)
+            print(f"  → Inserted {count4} rows into chronic_condition_modifiers")
 
             # 5. doctor_specialization
+            print("Importing doctor_specialization (5_doctor_specialization_10k.csv)...")
             df5 = pd.read_csv(DATA_DIR / "5_doctor_specialization_10k.csv")
             mapping5 = {
                 "Doctor_ID": "doctor_id",
@@ -127,9 +132,11 @@ async def run_import(force: bool = False):
                 "Consultation_Fee": "consultation_fee",
                 "Availability_Hours_Per_Week": "availability_hours_per_week",
             }
-            await import_table(df5, DoctorSpecialization, mapping5, session)
+            count5 = await import_table(df5, DoctorSpecialization, mapping5, session)
+            print(f"  → Inserted {count5} rows into doctor_specialization")
 
             # 6. focused_patient_dataset (optional/large)
+            print("Importing focused_patient_dataset (focused_patient_dataset_15k.csv)...")
             df6 = pd.read_csv(DATA_DIR / "focused_patient_dataset_15k.csv")
             mapping6 = {
                 "Patient_ID": "patient_id",
@@ -142,25 +149,26 @@ async def run_import(force: bool = False):
                 "Pre_Existing_Conditions": "pre_existing_conditions",
                 "Risk_Level": "risk_level",
             }
-            await import_table(df6, FocusedPatientDataset, mapping6, session)
+            count6 = await import_table(df6, FocusedPatientDataset, mapping6, session)
+            print(f"  → Inserted {count6} rows into focused_patient_dataset")
 
-            print("Committing imported rows...")
+            print(f"\nCommitting {count1+count2+count3+count4+count5+count6} total rows...")
         # commit happens on context exit
+
+    print("✓ Dataset import complete!")
 
     # Build a small symptom->department cache to speed triage lookups
     try:
-        import sqlalchemy
         from sqlalchemy import select
-        from backend.db import AsyncSessionLocal as _ASL
-        async with _ASL() as s:
+        async with AsyncSessionLocal() as s:
             stmt = select(SymptomSeverity.symptom_name, SymptomSeverity.associated_department)
             res = await s.execute(stmt)
-            mapping = {row[0].strip().lower(): row[1] for row in res if row[0]}
+            mapping = {row[0].strip().lower(): row[1] for row in res if row[0] and row[1]}
         with open(CACHE_FILE, "w", encoding="utf-8") as f:
             json.dump({"symptom_to_department": mapping}, f)
-        print(f"Wrote mapping cache to {CACHE_FILE}")
+        print(f"✓ Wrote symptom→department cache to {CACHE_FILE}")
     except Exception as e:
-        print("Failed to write cache:", e)
+        print(f"Warning: Failed to write cache: {e}")
 
 
 if __name__ == "__main__":
