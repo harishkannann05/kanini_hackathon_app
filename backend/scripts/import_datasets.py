@@ -47,10 +47,10 @@ async def import_table(df: pd.DataFrame, model_cls, mapping: dict, session):
 
 
 async def run_import(force: bool = False):
-    """Import all CSV datasets into PostgreSQL."""
+    """Import all CSV datasets into SQLite."""
     async with AsyncSessionLocal() as session:
         async with session.begin():
-            print("Importing datasets from dataset2/ into PostgreSQL...")
+            print("Importing datasets from dataset2/ into SQLite...")
 
             # 1. disease_priority
             print("Importing disease_priority (1_disease_priority_10k.csv)...")

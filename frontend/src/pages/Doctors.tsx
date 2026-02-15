@@ -9,6 +9,8 @@ import './Doctors.css';
 const Doctors: React.FC = () => {
     const history = useHistory();
     const [doctors, setDoctors] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         let sockets: Record<string, WebSocket> = {};
@@ -18,6 +20,8 @@ const Doctors: React.FC = () => {
                 const res = await api.get('/doctors');
                 const docs = res.data || [];
                 setDoctors(docs);
+                setError('');
+                setLoading(false);
 
                 // open websocket for each doctor to receive live queue updates
                 docs.forEach((d: any) => {
@@ -41,6 +45,8 @@ const Doctors: React.FC = () => {
                 });
             } catch (err) {
                 console.error(err);
+                setError('Failed to load doctors.');
+                setLoading(false);
             }
         };
 
@@ -82,9 +88,16 @@ const Doctors: React.FC = () => {
                         Medical Staff On-Duty
                     </h1>
 
-                    <IonList className="dark-list">
-                        {doctors.map(doc => (
-                            <IonItem key={doc.doctor_id} className="doctor-item" lines="none">
+                    {loading ? (
+                        <div className="loading-state">Loading doctors...</div>
+                    ) : error ? (
+                        <div className="loading-state error">{error}</div>
+                    ) : doctors.length === 0 ? (
+                        <div className="loading-state">No doctors available.</div>
+                    ) : (
+                        <IonList className="dark-list">
+                            {doctors.map(doc => (
+                                <IonItem key={doc.doctor_id} className="doctor-item" lines="none">
                                 <IonAvatar slot="start">
                                     <div className="doctor-avatar-box">
                                         Dr
@@ -107,9 +120,10 @@ const Doctors: React.FC = () => {
                                             {doc.is_available ? 'Available' : 'Busy'}
                                         </IonBadge>
                                     </div>
-                            </IonItem>
-                        ))}
-                    </IonList>
+                                </IonItem>
+                            ))}
+                        </IonList>
+                    )}
 
                     <div className="back-container">
                         <IonButton

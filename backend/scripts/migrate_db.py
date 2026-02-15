@@ -1,12 +1,9 @@
 """
-Hybrid Database Migration Script
-- Works with both SQLite (local) and PostgreSQL (Supabase)
+SQLite Database Migration Script
 - Creates tables and imports datasets
-- Can be run in both environments
 
 Usage:
-  For SQLite (local):   SET USE_SQLITE=1 && python -m backend.scripts.migrate_db
-  For PostgreSQL (prod): SET USE_SQLITE=0 && python -m backend.scripts.migrate_db
+    SET USE_SQLITE=1 && python -m backend.scripts.migrate_db
 """
 import asyncio
 import os
@@ -89,7 +86,7 @@ async def seed_departments_and_doctors():
                 dept_map = {}
                 for dept_name in DEPARTMENTS:
                     dept = Department(
-                        department_id=str(uuid.uuid4()),
+                        department_id=uuid.uuid4(),
                         name=dept_name,
                     )
                     session.add(dept)
@@ -103,7 +100,7 @@ async def seed_departments_and_doctors():
                     dept = dept_map.get(dept_name)
                     if dept:
                         doctor = Doctor(
-                            doctor_id=str(uuid.uuid4()),
+                            doctor_id=uuid.uuid4(),
                             specialization=spec,
                             department_id=dept.department_id,
                             experience_years=exp,
@@ -315,9 +312,8 @@ async def verify_data():
 
 async def main():
     """Run complete migration."""
-    db_type = "SQLite (Local)" if USE_SQLITE else "PostgreSQL (Supabase)"
     print(f"\n{'='*70}")
-    print(f"Database Migration - Using: {db_type}")
+    print("Database Migration - Using: SQLite")
     print(f"{'='*70}")
     
     steps = [

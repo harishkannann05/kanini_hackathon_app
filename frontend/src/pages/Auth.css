@@ -1,0 +1,46 @@
+.auth-page {
+    --ion-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+}
+
+.auth-card {
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.auth-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.auth-segment {
+    margin-bottom: 20px;
+}
+
+.auth-form {
+    margin-top: 20px;
+}
+
+.auth-item {
+    margin-bottom: 15px;
+}
+
+.auth-btn {
+    --background: linear-gradient(to right, #667eea, #764ba2);
+    font-weight: 600;
+    height: 48px;
+}
