@@ -87,6 +87,28 @@
     text-transform: uppercase;
 }
 
+.hero-logo-wrapper {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.hero-logo {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+.hero-brand-name {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--apollo-blue);
+    letter-spacing: -1.5px;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1;
+}
+
 /* Typography */
 .hero-title {
     font-size: 3.5rem;

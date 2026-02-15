@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonApp, setupIonicReact } from '@ionic/react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import PatientIntake from './pages/PatientIntake';
@@ -34,6 +34,23 @@ import './App.css';
 
 setupIonicReact();
 
+// Private Route Component
+const PrivateRoute: React.FC<{ component: React.ComponentType<any>; path: string; exact?: boolean }> = ({ component: Component, ...rest }) => {
+  const token = localStorage.getItem('token');
+  return (
+    <Route
+      {...rest}
+      render={props =>
+        token ? (
+          <Component {...props} />
+        ) : (
+          <Redirect to="/login" />
+        )
+      }
+    />
+  );
+};
+
 const App: React.FC = () => {
   return (
     <IonApp>
@@ -45,12 +62,17 @@ const App: React.FC = () => {
               <Route exact path="/" component={LandingPage} />
               <Route exact path="/login" component={Auth} />
               <Route exact path="/intake" component={PatientIntake} />
-              <Route exact path="/dashboard" component={Dashboard} />
               <Route exact path="/doctors" component={Doctors} />
-              <Route exact path="/admin-dashboard" component={AdminDashboard} />
-              <Route exact path="/doctor-dashboard" component={DoctorDashboard} />
-              <Route exact path="/recipient-dashboard" component={RecipientDashboard} />
-              <Route exact path="/patient-dashboard" component={PatientDashboard} />
+
+              {/* Protected Routes */}
+              <PrivateRoute exact path="/dashboard" component={Dashboard} />
+              <PrivateRoute exact path="/admin-dashboard" component={AdminDashboard} />
+              <PrivateRoute exact path="/doctor-dashboard" component={DoctorDashboard} />
+              <PrivateRoute exact path="/recipient-dashboard" component={RecipientDashboard} />
+              <PrivateRoute exact path="/patient-dashboard" component={PatientDashboard} />
+
+              {/* Fallback */}
+              <Redirect from="*" to="/" />
             </Switch>
           </main>
         </div>

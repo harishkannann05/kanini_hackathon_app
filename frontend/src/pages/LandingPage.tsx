@@ -20,6 +20,7 @@ import {
     logoInstagram
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import medicyLogo from '../assets/medicy_logo.png';
 import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
@@ -40,7 +41,10 @@ const LandingPage: React.FC = () => {
                 <div className="hero-section">
                     <div className="hero-content">
                         <div className="hero-text-container">
-                            <div className="badge">MEDICY HEALTHCARE</div>
+                            <div className="hero-logo-wrapper">
+                                <img src={medicyLogo} alt="Medicy Healthcare" className="hero-logo" />
+                                <span className="hero-brand-name">Medicy</span>
+                            </div>
                             <h1 className="hero-title">
                                 Advanced Care,<br />
                                 <span className="highlight-text">Always There.</span>
@@ -148,7 +152,7 @@ const LandingPage: React.FC = () => {
                     <div className="footer-content">
                         <div className="footer-brand">
                             <div className="footer-logo">
-                                <IonIcon icon={pulseOutline} />
+                                <img src={medicyLogo} alt="Medicy" />
                                 <span>Medicy</span>
                             </div>
                             <p>Transforming healthcare with AI-powered triage and seamless patient management.</p>

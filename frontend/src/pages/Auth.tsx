@@ -13,6 +13,7 @@ import {
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import api from '../api';
+import medicyLogo from '../assets/medicy_logo.png';
 import './Auth.css';
 
 const Auth: React.FC = () => {
@@ -125,7 +126,7 @@ const Auth: React.FC = () => {
                     <div className="auth-banner">
                         <div className="banner-content">
                             <div className="logo-brand">
-                                <IonIcon icon={medkitOutline} className="brand-logo-icon-auth" style={{ fontSize: '3rem', color: 'var(--color-teal-light)' }} />
+                                <img src={medicyLogo} alt="Medicy" className="brand-logo-img-auth" />
                                 <span>Medicy</span>
                             </div>
                             <h1>Healthcare<br />Reimagined.</h1>
