@@ -1,25 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     IonContent, IonPage,
     IonButton, IonLabel, IonInput, IonSelect, IonSelectOption,
-    IonChip, IonIcon, IonGrid, IonRow, IonCol
+    IonChip, IonIcon, IonGrid, IonRow, IonCol, IonToast
 } from '@ionic/react';
 import { cloudUploadOutline, closeCircle } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import api from '../api';
 import './PatientIntake.css';
 
-const SYMPTOMS = [
-    'Chest Pain', 'Shortness of Breath', 'Fever', 'Headache', 'Dizziness',
-    'Cough', 'Vomiting', 'Abdominal Pain', 'Palpitations', 'Weakness', 'Numbness', 'Diarrhea'
-];
-
-const CONDITIONS = [
-    'Hypertension', 'Diabetes', 'Heart Disease', 'Asthma', 'Chronic Kidney Disease'
-];
-
 const PatientIntake: React.FC = () => {
     const history = useHistory();
+    const fallbackSymptoms = [
+        'Chest Pain', 'Shortness of Breath', 'Fever', 'Headache', 'Dizziness',
+        'Cough', 'Vomiting', 'Abdominal Pain', 'Palpitations', 'Weakness', 'Numbness', 'Diarrhea'
+    ];
+    const fallbackConditions = [
+        'Hypertension', 'Diabetes', 'Heart Disease', 'Asthma', 'Chronic Kidney Disease'
+    ];
     const [formData, setFormData] = useState({
         age: '',
         gender: 'Male',
@@ -34,6 +32,35 @@ const PatientIntake: React.FC = () => {
 
     const [uploadedDocuments, setUploadedDocuments] = useState<string[]>([]);
     const [uploading, setUploading] = useState(false);
+    const [symptomOptions, setSymptomOptions] = useState<string[]>([]);
+    const [conditionOptions, setConditionOptions] = useState<string[]>([]);
+    const [toastMessage, setToastMessage] = useState('');
+    const [showToast, setShowToast] = useState(false);
+
+    useEffect(() => {
+        const loadOptions = async () => {
+            try {
+                const [symRes, condRes] = await Promise.all([
+                    api.get('/master/symptoms'),
+                    api.get('/master/chronic-conditions')
+                ]);
+
+                const symList = (symRes.data || []).map((s: any) => s.name).filter(Boolean);
+                const condList = (condRes.data || []).map((c: any) => c.name).filter(Boolean);
+
+                setSymptomOptions(symList.length > 0 ? symList : fallbackSymptoms);
+                setConditionOptions(condList.length > 0 ? condList : fallbackConditions);
+            } catch (err) {
+                console.error(err);
+                setSymptomOptions(fallbackSymptoms);
+                setConditionOptions(fallbackConditions);
+                setToastMessage('Failed to load symptom/condition lists. Using defaults.');
+                setShowToast(true);
+            }
+        };
+
+        loadOptions();
+    }, []);
 
     const toggleSymptom = (symptom: string) => {
         setSelectedSymptoms(prev =>
@@ -93,15 +120,46 @@ const PatientIntake: React.FC = () => {
     };
 
     const handleSubmit = async () => {
+        const age = parseInt(formData.age, 10);
+        const systolic = parseInt(formData.systolic_bp, 10);
+        const heartRate = parseInt(formData.heart_rate, 10);
+        const temperature = parseFloat(formData.temperature);
+
+        if (!age || age < 0) {
+            setToastMessage('Please enter a valid age.');
+            setShowToast(true);
+            return;
+        }
+        if (!systolic || systolic < 50) {
+            setToastMessage('Please enter a valid systolic BP.');
+            setShowToast(true);
+            return;
+        }
+        if (!heartRate || heartRate < 30) {
+            setToastMessage('Please enter a valid heart rate.');
+            setShowToast(true);
+            return;
+        }
+        if (!temperature || temperature < 30) {
+            setToastMessage('Please enter a valid temperature in °C.');
+            setShowToast(true);
+            return;
+        }
+        if (selectedSymptoms.length === 0) {
+            setToastMessage('Select at least one symptom.');
+            setShowToast(true);
+            return;
+        }
+
         try {
             const payload = {
-                age: parseInt(formData.age) || 0,
+                age,
                 gender: formData.gender,
                 symptoms: selectedSymptoms,
-                systolic_bp: parseInt(formData.systolic_bp) || 120,
-                heart_rate: parseInt(formData.heart_rate) || 80,
-                temperature: parseFloat(formData.temperature) || 98.6,
-                visit_type: formData.visit_type, // "Walk-In"
+                systolic_bp: systolic,
+                heart_rate: heartRate,
+                temperature,
+                visit_type: formData.visit_type,
                 chronic_conditions: selectedConditions,
                 uploaded_documents: uploadedDocuments
             };
@@ -122,7 +180,8 @@ const PatientIntake: React.FC = () => {
                 message = JSON.stringify(detail);
             }
 
-            alert(message);
+            setToastMessage(message);
+            setShowToast(true);
         }
     };
 
@@ -222,7 +281,7 @@ const PatientIntake: React.FC = () => {
                     <div className="symptoms-section">
                         <label className="section-label">SYMPTOMS (CLICK TO SELECT)</label>
                         <div className="chip-container">
-                            {SYMPTOMS.map(symptom => (
+                            {symptomOptions.map(symptom => (
                                 <IonChip
                                     key={symptom}
                                     onClick={() => toggleSymptom(symptom)}
@@ -238,7 +297,7 @@ const PatientIntake: React.FC = () => {
                     <div className="conditions-section">
                         <label className="section-label">PRE-EXISTING CONDITIONS</label>
                         <div className="chip-container">
-                            {CONDITIONS.map(condition => (
+                            {conditionOptions.map(condition => (
                                 <IonChip
                                     key={condition}
                                     onClick={() => toggleCondition(condition)}
@@ -286,6 +345,13 @@ const PatientIntake: React.FC = () => {
                     </div>
                 </div>
             </IonContent>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={2500}
+                color="danger"
+            />
         </IonPage>
     );
 };

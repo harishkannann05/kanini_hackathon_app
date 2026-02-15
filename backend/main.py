@@ -1,8 +1,8 @@
 """
 Main FastAPI Application — Full orchestration with SHAP explainability.
-Aligned with actual Supabase schema.
+Aligned with the app schema (SQLite runtime).
 """
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +14,7 @@ import os
 import shutil
 import traceback
 import logging
+from typing import Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,17 +23,18 @@ from db import get_db
 from db import init_db, USE_SQLITE
 from models import (
     Patient, Visit, AIAssessment, DoctorAssignment,
-    Queue, AuditLog, EmergencyAlert, Doctor, Department, Document
+    Queue, AuditLog, EmergencyAlert, Doctor, Department, Document, ChronicCondition
 )
 from schemas import VisitRequest, VisitResponse, OverrideRequest, ServeRequest
 from services.triage_service import run_triage
 from services.doctor_service import assign_doctor
 from services.queue_service import (
-    insert_into_queue, estimate_wait_time, get_doctor_queue
+    insert_into_queue, estimate_wait_time, reorder_queue_for_doctor
 )
 from services.ocr_service import extract_text_from_file, detect_conditions, merge_ocr_with_payload
 from services.ws_manager import manager as ws_manager
-from services.auth_service import create_user, authenticate_user
+from services.auth_service import create_user, authenticate_user, get_current_user
+from schemas import AuthRegister, AuthLogin
 from pydantic import BaseModel
 from fastapi import Depends
 import jwt
@@ -40,34 +42,31 @@ JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret")
 JWT_ALGO = "HS256"
 
 
-class AuthRegister(BaseModel):
-    full_name: str
-    email: str
-    password: str
-    role: str = "Recipient"
-
-
-class AuthLogin(BaseModel):
-    email: str
-    password: str
 
 app = FastAPI(title="AI Smart Patient Triage", version="2.0.0")
+
+# CORS Configuration - Allow frontend to make requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Frontend URLs
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 
 @app.on_event("startup")
 async def startup_event():
-    # Tables already created by migration script
-    # Skip init_db for now to avoid potential issues
-    logger.info("Application started successfully")
+    # Ensure SQLite tables exist and seed departments/doctors if needed.
+    await init_db()
+    try:
+        from scripts.migrate_db import seed_departments_and_doctors
+        await seed_departments_and_doctors()
+    except Exception as e:
+        logger.warning(f"Startup seed skipped: {e}")
 
-# ── CORS ───────────────────────────────────────────────────────
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    # ML models are auto-loaded when the triage_service module is imported
+    logger.info("Application started successfully")
 
 # ── Serve static UI ───────────────────────────────────────────
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "templates")
@@ -88,146 +87,34 @@ async def serve_test_ui():
 # ══════════════════════════════════════════════════════════════
 #  POST /visits — Full Orchestration Endpoint
 # ══════════════════════════════════════════════════════════════
+from services.visit_service import create_visit_orchestration
+
+# ...
+
 @app.post("/visits", response_model=VisitResponse)
 async def create_visit(payload: VisitRequest, db: AsyncSession = Depends(get_db)):
     """
-    Atomic orchestration:
-    1. OCR extraction (if files)
-    2. Merge extracted data
-    3. Create patient
-    4. Create visit
-    5. AI inference + SHAP
-    6. Save AI assessment
-    7. Emergency alert (if High)
-    8. Assign doctor
-    9. Insert into queue
-    10. Calculate wait time
-    11. Audit log
+    Atomic orchestration via visit_service.
     """
     try:
-      async with db.begin():
-        payload_dict = payload.model_dump()
-
-        # ── 1. OCR Processing ──
-        ocr_detected = {"chronic_conditions": [], "symptoms": []}
-        for doc_path in payload_dict.get("uploaded_documents", []):
-            text = extract_text_from_file(doc_path)
-            if text:
-                detected = detect_conditions(text)
-                ocr_detected["chronic_conditions"].extend(detected.get("chronic_conditions", []))
-                ocr_detected["symptoms"].extend(detected.get("symptoms", []))
-
-        # ── 2. Merge OCR results ──
-        if ocr_detected["chronic_conditions"] or ocr_detected["symptoms"]:
-            payload_dict = merge_ocr_with_payload(payload_dict, ocr_detected)
-
-        # ── 3. Create Patient ──
-        patient_id = str(uuid.uuid4())
-        new_patient = Patient(
-            patient_id=patient_id,
-            age=payload_dict["age"],
-            gender=payload_dict["gender"],
-            symptoms=", ".join(payload_dict["symptoms"]),
-            blood_pressure=f"{payload_dict['systolic_bp']}/0",
-            heart_rate=payload_dict["heart_rate"],
-            temperature=payload_dict["temperature"],
-            pre_existing_conditions=", ".join(payload_dict["chronic_conditions"]),
-        )
-        db.add(new_patient)
-
-        # ── 4. Create Visit ──
-        visit_id = str(uuid.uuid4())
-        new_visit = Visit(
-            visit_id=visit_id,
-            patient_id=patient_id,
-            visit_type=payload_dict["visit_type"],
-        )
-        db.add(new_visit)
-        await db.flush()
-
-        # ── 5. Run AI Triage (with SHAP) ──
-        triage_result = run_triage(payload_dict)
-
-        # Update patient risk level
-        new_patient.risk_level = triage_result["risk_level"]
-
-        # Update visit emergency flag
-        if triage_result["risk_level"] == "High":
-            new_visit.emergency_flag = True
-
-        # ── 6. Look up department UUID ──
-        dept_name = triage_result["department_name"]
-        dept_stmt = select(Department.department_id).where(
-            func.lower(Department.name) == dept_name.lower()
-        )
-        dept_result = await db.execute(dept_stmt)
-        dept_uuid = dept_result.scalar_one_or_none()
-
-        # ── 7. Save AI Assessment ──
-        new_assessment = AIAssessment(
-            assessment_id=str(uuid.uuid4()),
-            visit_id=visit_id,
-            risk_score=triage_result["risk_score"],
-            risk_level=triage_result["risk_level"],
-            recommended_department=str(dept_uuid) if dept_uuid else None,
-            confidence_score=triage_result["confidence"],
-            model_version=triage_result["model_version"],
-            shap_explanation=triage_result["shap_explanation"],
-        )
-        db.add(new_assessment)
-
-        # ── 8. Emergency Alert (if High) ──
-        if triage_result["risk_level"] == "High":
-            alert = EmergencyAlert(
-                alert_id=str(uuid.uuid4()),
-                visit_id=visit_id,
-                triggered_by="AI",
-                alert_message=f"High-risk patient detected. Score: {triage_result['risk_score']}. Department: {dept_name}",
+        async with db.begin():
+            payload_dict = payload.model_dump()
+            result = await create_visit_orchestration(db, payload_dict)
+            
+            # Audit Log
+            audit = AuditLog(
+                log_id=uuid.uuid4(),
+                action="visit_created",
+                target_table="visits",
+                target_id=uuid.UUID(result["visit_id"]),
+                details=f"Risk: {result['risk_level']}, Dept: {result['department']}"
             )
-            db.add(alert)
-
-        # ── 9. Assign Doctor ──
-        doctor_id, _ = await assign_doctor(db, dept_name, triage_result["risk_level"])
-
-        if doctor_id:
-            new_assignment = DoctorAssignment(
-                assignment_id=str(uuid.uuid4()),
-                visit_id=visit_id,
-                doctor_id=doctor_id,
-            )
-            db.add(new_assignment)
-
-        # ── 10. Insert into Queue ──
-        queue_position = 0
-        wait_minutes = 0
-        if doctor_id:
-            queue_position = await insert_into_queue(db, visit_id, doctor_id, triage_result)
-            wait_minutes = await estimate_wait_time(db, visit_id, doctor_id)
-
-        # ── 11. Audit Log ──
-        audit = AuditLog(
-            log_id=str(uuid.uuid4()),
-            action="visit_created",
-            target_table="visits",
-            target_id=visit_id,
-        )
-        db.add(audit)
-
-      return VisitResponse(
-          visit_id=visit_id,
-          patient_id=patient_id,
-          risk_level=triage_result["risk_level"],
-          risk_score=triage_result["risk_score"],
-          confidence=triage_result["confidence"],
-          department=dept_name,
-          doctor_id=doctor_id,
-          queue_position=queue_position,
-          estimated_wait_minutes=wait_minutes,
-          shap_explanation=triage_result["shap_explanation"],
-      )
+            db.add(audit)
+            return result
     except Exception as e:
-      logger.error(f"POST /visits failed: {traceback.format_exc()}")
-      raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error creating visit: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ══════════════════════════════════════════════════════════════
@@ -253,70 +140,6 @@ async def upload_document(file: UploadFile = File(...)):
     }
 
 
-# ══════════════════════════════════════════════════════════════
-#  GET /queue/{doctor_id} — Doctor's active queue
-# ══════════════════════════════════════════════════════════════
-@app.get("/queue/{doctor_id}")
-async def get_queue(doctor_id: str, db: AsyncSession = Depends(get_db)):
-    async with db.begin():
-        queue = await get_doctor_queue(db, doctor_id)
-        return {"doctor_id": doctor_id, "queue": queue}
-
-
-# ══════════════════════════════════════════════════════════════
-#  POST /queue/{queue_id}/serve — Mark consultation start/complete
-# ══════════════════════════════════════════════════════════════
-@app.post("/queue/{queue_id}/serve")
-async def serve_queue_entry(queue_id: str, req: ServeRequest, db: AsyncSession = Depends(get_db)):
-    async with db.begin():
-        stmt = select(Queue).where(Queue.queue_id == queue_id)
-        result = await db.execute(stmt)
-        entry = result.scalars().first()
-        if not entry:
-            raise HTTPException(status_code=404, detail="Queue entry not found")
-
-        if req.action == "start":
-            # Update visit status
-            await db.execute(
-                update(Visit).where(Visit.visit_id == entry.visit_id).values(status="In Consultation")
-            )
-        elif req.action == "complete":
-            await db.execute(
-                update(Visit).where(Visit.visit_id == entry.visit_id).values(
-                    status="Completed",
-                    completed_at=datetime.now(timezone.utc)
-                )
-            )
-            # Deactivate doctor assignment
-            await db.execute(
-                update(DoctorAssignment)
-                .where(DoctorAssignment.visit_id == entry.visit_id)
-                .values(is_active=False)
-            )
-
-        audit = AuditLog(
-            log_id=str(uuid.uuid4()),
-            action=f"queue_{req.action}",
-            target_table="queue",
-            target_id=queue_id,
-        )
-        db.add(audit)
-        # notify websocket clients if this queue entry belonged to a doctor
-        try:
-            # load queue entry to find doctor_id
-            q_stmt = select(Queue).where(Queue.queue_id == queue_id)
-            qres = await db.execute(q_stmt)
-            qentry = qres.scalars().first()
-            if qentry and qentry.doctor_id:
-                await ws_manager.broadcast_to_doctor(str(qentry.doctor_id), {
-                    "event": f"queue_{req.action}",
-                    "queue_id": queue_id,
-                    "visit_id": str(qentry.visit_id),
-                    "action": req.action,
-                })
-        except Exception:
-            pass
-    return {"status": "ok", "queue_id": queue_id, "action": req.action}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -338,10 +161,12 @@ async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = 
         queue_stmt = select(Queue).where(Queue.visit_id == visit_id)
         queue_result = await db.execute(queue_stmt)
         queue_entry = queue_result.scalars().first()
+        doctor_id = None
         if queue_entry:
             score_map = {"High": 100, "Medium": 60, "Low": 30}
             queue_entry.priority_score = score_map.get(req.new_risk_level, 30)
             queue_entry.is_emergency = req.new_risk_level == "High"
+            doctor_id = str(queue_entry.doctor_id) if queue_entry.doctor_id else None
 
         audit = AuditLog(
             log_id=str(uuid.uuid4()),
@@ -350,6 +175,13 @@ async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = 
             target_id=visit_id,
         )
         db.add(audit)
+
+        if doctor_id:
+            queue_list = await reorder_queue_for_doctor(db, doctor_id)
+            await ws_manager.broadcast_to_doctor(doctor_id, {
+                "event": "queue_reordered",
+                "queue": queue_list
+            })
 
     return {"status": "ok", "visit_id": visit_id, "old_risk": old_risk, "new_risk": req.new_risk_level}
 
@@ -379,8 +211,9 @@ async def list_doctors(db: AsyncSession = Depends(get_db)):
 
 
 @app.websocket("/ws/doctor/{doctor_id}")
-async def websocket_doctor_queue(websocket, doctor_id: str):
+async def websocket_doctor_queue(websocket: WebSocket, doctor_id: str):
     """WebSocket endpoint for doctor-specific live queue updates."""
+    await websocket.accept()
     try:
         await ws_manager.connect(doctor_id, websocket)
         # upon connection, send a simple hello message
@@ -455,21 +288,99 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
 
 
 # ── AUTH ENDPOINTS (simple JWT) ─────────────────────────────────
+# ── AUTH ENDPOINTS (simple JWT) ─────────────────────────────────
 @app.post("/auth/register")
-async def register_user(req: AuthRegister, db: AsyncSession = Depends(get_db)):
-    async with db.begin():
-        user = await create_user(db, req.full_name, req.email, req.password, req.role)
-    return {"status": "ok", **user}
+async def register_user_endpoint(req: AuthRegister, db: AsyncSession = Depends(get_db)):
+    try:
+        async with db.begin():
+            user = await create_user(
+                db,
+                req.full_name,
+                req.email,
+                req.password,
+                req.role,
+                phone_number=req.phone_number,
+                age=req.age,
+                gender=req.gender,
+                department_id=req.department_id,
+                department_name=req.department_name,
+                specialization=req.specialization,
+                experience_years=req.experience_years,
+            )
+        return {"status": "ok", **user}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 
 @app.post("/auth/login")
-async def login_user(req: AuthLogin, db: AsyncSession = Depends(get_db)):
+async def login_user_endpoint(req: AuthLogin, db: AsyncSession = Depends(get_db)):
     auth = await authenticate_user(db, req.email, req.password)
     if not auth:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return auth
 
 
-def get_current_user(token: str = Depends(lambda: None)):
-    # placeholder for dependency wiring in future; keep simple for now
-    return None
+@app.get("/auth/me")
+async def get_current_user_profile(current_user: dict = Depends(get_current_user)):
+    """Return the currently authenticated user's profile from token."""
+    return current_user
+
+
+@app.get("/master/symptoms")
+async def get_master_symptoms(q: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    """Fetch symptom suggestions for autocomplete."""
+    from models import SymptomSeverity
+    stmt = select(SymptomSeverity)
+    if q:
+        stmt = stmt.where(SymptomSeverity.symptom_name.ilike(f"%{q}%"))
+    stmt = stmt.limit(20)
+    result = await db.execute(stmt)
+    symptoms = result.scalars().all()
+    return [{"name": s.symptom_name, "severity": s.base_severity} for s in symptoms]
+
+
+@app.get("/master/chronic-conditions")
+async def get_master_chronic_conditions(q: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    """Fetch chronic condition suggestions for autocomplete."""
+    stmt = select(ChronicCondition)
+    if q:
+        stmt = stmt.where(ChronicCondition.chronic_condition.ilike(f"%{q}%"))
+    stmt = stmt.limit(20)
+    result = await db.execute(stmt)
+    conditions = result.scalars().all()
+    return [{"name": c.chronic_condition, "risk_modifier": c.risk_modifier_score} for c in conditions]
+
+
+@app.get("/departments")
+async def list_departments(db: AsyncSession = Depends(get_db)):
+    async with db.begin():
+        result = await db.execute(select(Department))
+        departments = result.scalars().all()
+        return [
+            {
+                "department_id": str(d.department_id),
+                "name": d.name,
+                "description": d.description,
+            }
+            for d in departments
+        ]
+
+
+# ── DASHBOARD / STATS ──────────────────────────────────────────
+from routes import recipient, doctor, whatsapp, patient, insights, queue_mgmt
+
+app.include_router(recipient.router)
+app.include_router(doctor.router)
+app.include_router(whatsapp.router)
+app.include_router(patient.router)
+app.include_router(insights.router)
+app.include_router(queue_mgmt.router)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

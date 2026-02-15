@@ -1,0 +1,66 @@
+{
+    "1_disease_priority_10k.csv": [
+        "Condition_ID",
+        "Condition_Name",
+        "Condition_Category",
+        "Base_Severity_Score",
+        "Default_Department",
+        "Emergency_Flag",
+        "Contagious_Flag",
+        "Max_Recommended_Wait_Time_Minutes",
+        "Mortality_Risk_Level",
+        "Progression_Speed"
+    ],
+    "2_symptom_severity_10k.csv": [
+        "Symptom_ID",
+        "Symptom_Name",
+        "Base_Severity",
+        "Emergency_Trigger",
+        "Associated_Department",
+        "Possible_Linked_Conditions",
+        "Typical_Duration_Days"
+    ],
+    "3_vital_signs_reference_10k.csv": [
+        "Vital_ID",
+        "Vital_Type",
+        "Age_Group",
+        "Condition_Modifier",
+        "Critical_Low_Threshold",
+        "Critical_High_Threshold",
+        "Moderate_Low_Threshold",
+        "Moderate_High_Threshold",
+        "Critical_Instability_Score",
+        "Moderate_Instability_Score"
+    ],
+    "4_chronic_condition_modifiers_10k.csv": [
+        "Chronic_ID",
+        "Chronic_Condition",
+        "Risk_Modifier_Score",
+        "High_Risk_With_Symptoms",
+        "Associated_Department",
+        "Complication_Risk_Level"
+    ],
+    "5_doctor_specialization_10k.csv": [
+        "Doctor_ID",
+        "Specialization",
+        "Subspecialty",
+        "Experience_Years",
+        "Max_Patients_Per_Hour",
+        "Critical_Case_Certified",
+        "Performance_Score",
+        "Preferred_Case_Types",
+        "Consultation_Fee",
+        "Availability_Hours_Per_Week"
+    ],
+    "focused_patient_dataset_15k.csv": [
+        "Patient_ID",
+        "Age",
+        "Gender",
+        "Symptoms",
+        "Blood_Pressure",
+        "Heart_Rate",
+        "Temperature",
+        "Pre_Existing_Conditions",
+        "Risk_Level"
+    ]
+}

@@ -1,0 +1,143 @@
+.patient-page {
+    --background: #f0fdf4;
+}
+
+.dashboard-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.center-msg {
+    text-align: center;
+    margin-top: 3rem;
+    color: #666;
+}
+
+.center-msg.error {
+    color: #eb445a;
+}
+
+.profile-card {
+    background: linear-gradient(135deg, #2dd36f 0%, #28ba62 100%);
+    color: white;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.avatar-circle {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.profile-text h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+}
+
+.profile-text p {
+    margin: 0.2rem 0 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.section-title {
+    margin-left: 0.5rem;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.visit-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.visit-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.visit-detail-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.visit-detail-row span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stats-grid {
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    margin: 0;
+    text-align: center;
+    border-radius: 12px;
+    color: white;
+}
+
+.stat-card.blue {
+    background: #3880ff;
+}
+
+.stat-card.purple {
+    background: #7044ff;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.visit-score-container {
+    margin-top: 10px;
+}
+
+.score-bar {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.score-fill {
+    height: 100%;
+}
+
+.score-text {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.visit-score {
+    font-size: 0.85rem;
+    color: #999;
+    text-align: right;
+}

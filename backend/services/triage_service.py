@@ -155,3 +155,38 @@ def run_triage(payload: dict) -> dict:
         "model_version": model_version,
         "shap_explanation": shap_explanation,
     }
+
+
+def extract_symptoms_from_text(text: str) -> list[str]:
+    """
+    Parses natural language text to extract symptoms.
+    Uses keyword matching against known symptoms.
+    """
+    text_lower = text.lower()
+    found_symptoms = []
+    
+    # Simple keyword matching from SYMPTOM_DEPT_MAP
+    for symptom in SYMPTOM_DEPT_MAP.keys():
+        if symptom in text_lower:
+            found_symptoms.append(symptom)
+    return found_symptoms
+
+def run_triage_text(text: str) -> dict:
+    """
+    1. Parse text for symptoms
+    2. Run ML prediction
+    """
+    found_symptoms = extract_symptoms_from_text(text)
+             
+    # Default payload with extracted symptoms
+    payload = {
+        "age": 30, # Default
+        "gender": "Male", # Default
+        "systolic_bp": 120,
+        "heart_rate": 72,
+        "temperature": 37.0,
+        "symptoms": found_symptoms,
+        "chronic_conditions": []
+    }
+    
+    return run_triage(payload)

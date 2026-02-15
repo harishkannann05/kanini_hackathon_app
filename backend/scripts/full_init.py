@@ -1,6 +1,6 @@
 """
-Complete initialization script:
-1. Create all tables in PostgreSQL Supabase
+Complete initialization script (SQLite):
+1. Create all tables
 2. Import all datasets
 3. Seed departments and doctors
 4. Build cache mappings
@@ -16,8 +16,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-# OVERRIDE USE_SQLITE to ensure PostgreSQL
-os.environ["USE_SQLITE"] = "0"
+os.environ["USE_SQLITE"] = "1"
 
 from dotenv import load_dotenv
 load_dotenv(ROOT / "backend" / ".env")
@@ -32,9 +31,9 @@ sys.path.insert(0, str(ROOT / "backend"))
 
 
 async def create_tables():
-    """Create all ORM tables in PostgreSQL."""
+    """Create all ORM tables in SQLite."""
     print("\n" + "="*70)
-    print("STEP 1: Creating all tables in PostgreSQL...")
+    print("STEP 1: Creating all tables in SQLite...")
     print("="*70)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

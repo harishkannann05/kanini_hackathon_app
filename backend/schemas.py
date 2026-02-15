@@ -18,6 +18,11 @@ class VisitRequest(BaseModel):
     chronic_conditions: list[str] = []
     visit_type: str = "Walk-In"
     uploaded_documents: list[str] = []  # file paths for OCR
+    patient_id: Optional[str] = None
+    full_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    manual_doctor_id: Optional[str] = None
+    use_preferred_doctor: bool = True
 
 
 # ── Output ─────────────────────────────────────────────────────
@@ -56,3 +61,32 @@ class QueueEntry(BaseModel):
     is_emergency: bool
     waiting_minutes: int
     position: int
+
+
+class AuthRegister(BaseModel):
+    full_name: str
+    email: str
+    password: str
+    role: str = "Recipient"
+    phone_number: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    department_id: Optional[str] = None
+    department_name: Optional[str] = None
+    specialization: Optional[str] = None
+    experience_years: Optional[int] = None
+
+
+class AuthLogin(BaseModel):
+    email: str
+    password: str
+
+
+class MedicalRecordCreate(BaseModel):
+    doctor_id: Optional[str] = None
+    diagnosis: Optional[str] = None
+    syndrome_identified: Optional[str] = None
+    treatment_plan: Optional[str] = None
+    follow_up_required: bool = False
+    follow_up_date: Optional[str] = None
+    notes: Optional[str] = None

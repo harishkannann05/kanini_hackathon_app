@@ -1,5 +1,5 @@
 """
-Initialize all tables in PostgreSQL Supabase.
+Initialize all tables in SQLite.
 Run: python -m backend.scripts.init_tables_postgres
 This creates all ORM tables and reference data tables.
 """
@@ -18,8 +18,8 @@ from backend.models import Base
 
 
 async def init_all_tables():
-    """Create all tables in PostgreSQL."""
-    print("Connecting to PostgreSQL Supabase...")
+    """Create all tables in SQLite."""
+    print("Initializing SQLite tables...")
     async with engine.begin() as conn:
         print("Creating all tables...")
         await conn.run_sync(Base.metadata.create_all)

@@ -1,0 +1,34 @@
+.admin-page {
+    --background: #f4f5f8;
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-icon {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 5rem;
+    color: rgba(0, 0, 0, 0.05);
+    transform: rotate(-15deg);
+}
+
+.section-header h3 {
+    margin-left: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.dept-card {
+    text-align: center;
+}
+
+.dept-count {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #3880ff;
+    margin: 0.5rem 0;
+}
