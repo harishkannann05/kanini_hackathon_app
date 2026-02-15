@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonBadge, IonAvatar, IonButton, IonIcon } from '@ionic/react';
+import { IonContent, IonPage, IonList, IonItem, IonLabel, IonBadge, IonAvatar, IonButton, IonIcon } from '@ionic/react';
 import { peopleOutline } from 'ionicons/icons';
 import api from '../api';
 
@@ -47,33 +47,12 @@ const Doctors: React.FC = () => {
         load();
 
         return () => {
-            Object.values(sockets).forEach(s => { try { s.close(); } catch(e){} });
+            Object.values(sockets).forEach(s => { try { s.close(); } catch (e) { } });
         };
     }, []);
 
     return (
         <IonPage className="doctors-page">
-            <IonHeader>
-                <IonToolbar className="custom-toolbar">
-                    <IonTitle className="custom-title" onClick={() => history.push('/')} style={{ cursor: 'pointer' }}>
-                        <span className="logo-icon">🏥</span> AI Smart Triage
-                    </IonTitle>
-                    <div slot="end" className="nav-buttons">
-                        <IonButton fill="clear" routerLink="/" className="nav-btn">
-                            Home
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/intake">
-                            Patient Intake
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/dashboard">
-                            Dashboard
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/doctors" className="active-nav">
-                            Doctors
-                        </IonButton>
-                    </div>
-                </IonToolbar>
-            </IonHeader>
 
             <IonContent className="dark-content">
                 <div className="doctors-container">
@@ -95,18 +74,18 @@ const Doctors: React.FC = () => {
                                     <p>{doc.department_name}</p>
                                     <p className="exp-badge">{doc.experience_years} Years Experience</p>
                                 </IonLabel>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        {doc._live_activity && (
-                                            <IonBadge color="primary">Live</IonBadge>
-                                        )}
-                                        <IonBadge
-                                            slot="end"
-                                            className="status-badge"
-                                            color={doc.is_available ? 'success' : 'warning'}
-                                        >
-                                            {doc.is_available ? 'Available' : 'Busy'}
-                                        </IonBadge>
-                                    </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    {doc._live_activity && (
+                                        <IonBadge color="primary">Live</IonBadge>
+                                    )}
+                                    <IonBadge
+                                        slot="end"
+                                        className="status-badge"
+                                        color={doc.is_available ? 'success' : 'warning'}
+                                    >
+                                        {doc.is_available ? 'Available' : 'Busy'}
+                                    </IonBadge>
+                                </div>
                             </IonItem>
                         ))}
                     </IonList>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent, IonButton, IonBadge, IonList, IonItem, IonLabel } from '@ionic/react';
+import { IonContent, IonPage, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent, IonButton, IonBadge, IonList, IonItem, IonLabel } from '@ionic/react';
 import api from '../api';
 
 import { useHistory } from 'react-router-dom';
@@ -27,27 +27,6 @@ const Dashboard: React.FC = () => {
 
     return (
         <IonPage className="dashboard-page">
-            <IonHeader>
-                <IonToolbar className="custom-toolbar">
-                    <IonTitle className="custom-title" onClick={() => history.push('/')} style={{ cursor: 'pointer' }}>
-                        <span className="logo-icon">🏥</span> AI Smart Triage
-                    </IonTitle>
-                    <div slot="end" className="nav-buttons">
-                        <IonButton fill="clear" routerLink="/" className="nav-btn">
-                            Home
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/intake">
-                            Patient Intake
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/dashboard" className="active-nav">
-                            Dashboard
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/doctors">
-                            Doctors
-                        </IonButton>
-                    </div>
-                </IonToolbar>
-            </IonHeader>
 
             <IonContent className="dark-content">
                 <div className="dashboard-container">

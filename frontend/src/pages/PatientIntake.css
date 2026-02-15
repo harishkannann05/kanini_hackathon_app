@@ -1,70 +1,90 @@
+/* ============================================
+   PATIENT INTAKE - MEDICAL THEME
+   ============================================ */
+
 .patient-intake-page {
-    --background: #0a0e27;
+    --background: var(--color-background);
 }
 
-.custom-toolbar {
-    --background: #0f1535;
-    --color: #ffffff;
-    padding: 0 2rem;
-}
-
-.custom-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.logo-icon {
-    font-size: 1.8rem;
-}
-
-.nav-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.nav-buttons ion-button {
-    --color: #8b92b0;
-    text-transform: none;
-    font-weight: 500;
-}
-
-.nav-buttons ion-button.active-nav {
-    --color: #4c9aff;
-    --background: rgba(76, 154, 255, 0.1);
-}
+/* ============================================
+   CONTENT AREA
+   ============================================ */
 
 .dark-content {
-    --background: #0a0e27;
-    --color: #ffffff;
+    --background: var(--color-background);
 }
 
 .intake-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 3rem 2rem;
+    animation: fadeIn 0.5s ease-out;
 }
+
+/* ============================================
+   SECTION HEADER
+   ============================================ */
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--color-primary);
+    position: relative;
 }
 
-.section-header h2 {
-    color: #ffffff;
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background: var(--color-beige);
+    animation: slideRight 0.6s ease-out;
+}
+
+@keyframes slideRight {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100px;
+    }
 }
 
 .section-icon {
-    font-size: 1.5rem;
-    color: #4c9aff;
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    animation: bounce 2s ease-in-out infinite;
 }
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.section-header h2 {
+    font-family: var(--font-family-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+/* ============================================
+   FORM GROUPS
+   ============================================ */
 
 .form-group {
     margin-bottom: 1.5rem;
@@ -72,44 +92,85 @@
 
 .form-group label {
     display: block;
-    color: #8b92b0;
     font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--color-text-secondary);
     margin-bottom: 0.5rem;
     text-transform: uppercase;
 }
 
 .custom-input,
 .custom-select {
-    --background: #1a1f3a;
-    --color: #ffffff;
-    --placeholder-color: #4a5168;
-    --border-radius: 8px;
+    --background: var(--color-surface);
+    --color: var(--color-text-primary);
+    --border-color: var(--color-border);
+    --border-radius: var(--radius-md);
     --padding-start: 1rem;
     --padding-end: 1rem;
-    border: 1px solid #2a2f4a;
-    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .custom-input:focus,
 .custom-select:focus {
-    border-color: #4c9aff;
+    --border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    transform: translateY(-2px);
+}
+
+.custom-input:hover,
+.custom-select:hover {
+    --border-color: var(--color-secondary);
+}
+
+/* ============================================
+   SYMPTOMS & CONDITIONS SECTION
+   ============================================ */
+
+.symptoms-section,
+.conditions-section {
+    margin: 2.5rem 0;
+    padding: 2rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.symptoms-section:hover,
+.conditions-section:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-lg);
 }
 
 .section-label {
     display: block;
-    color: #8b92b0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
     text-transform: uppercase;
+    position: relative;
+    padding-left: 1rem;
 }
 
-.symptoms-section,
-.conditions-section {
-    margin: 2rem 0;
+.section-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border-radius: var(--radius-sm);
 }
 
 .chip-container {
@@ -118,48 +179,109 @@
     gap: 0.75rem;
 }
 
-.chip-unselected {
-    --background: #1a1f3a;
-    --color: #8b92b0;
-    border: 1px solid #2a2f4a;
+/* Chip Styles */
+.chip-unselected,
+.chip-selected {
+    --background: var(--color-surface);
+    --color: var(--color-text-primary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-full);
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
 }
 
 .chip-unselected:hover {
-    --background: #252b4a;
-    --color: #ffffff;
-    border-color: #4c9aff;
+    --background: var(--color-accent);
+    --color: var(--color-primary);
+    border-color: var(--color-secondary);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-md);
 }
 
 .chip-selected {
-    --background: #4c9aff;
-    --color: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    --background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    --color: var(--color-text-on-primary);
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    animation: chipSelect 0.3s ease-out;
+}
+
+@keyframes chipSelect {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1.05);
+    }
 }
 
 .chip-selected ion-icon {
-    margin-left: 0.25rem;
-    cursor: pointer;
+    color: var(--color-text-on-primary);
+    margin-left: 0.5rem;
+    animation: rotate 0.3s ease-out;
 }
 
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(180deg);
+    }
+}
+
+/* ============================================
+   UPLOAD SECTION
+   ============================================ */
+
 .upload-section {
-    margin: 2rem 0;
+    margin: 2.5rem 0;
 }
 
 .upload-box {
-    background: #1a1f3a;
-    border: 2px dashed #2a2f4a;
-    border-radius: 12px;
-    padding: 2rem;
+    background: var(--color-surface);
+    border: 3px dashed var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
     text-align: center;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(168, 197, 209, 0.1),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.upload-box:hover::before {
+    left: 100%;
 }
 
 .upload-box:hover {
-    border-color: #4c9aff;
-    background: #1f2540;
+    border-color: var(--color-primary);
+    background: rgba(168, 197, 209, 0.05);
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
 }
 
 .upload-label {
@@ -168,55 +290,204 @@
 }
 
 .upload-icon {
-    font-size: 3rem;
-    color: #4c9aff;
+    font-size: 4rem;
+    color: var(--color-secondary);
     margin-bottom: 1rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
 }
 
 .upload-label p {
-    color: #ffffff;
-    font-size: 1rem;
-    margin: 0.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
 }
 
 .upload-label span {
-    color: #8b92b0;
     font-size: 0.875rem;
+    color: var(--color-text-secondary);
 }
 
 .uploaded-file {
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg,
+            rgba(16, 185, 129, 0.1),
+            rgba(168, 197, 209, 0.1));
+    border: 2px solid var(--color-success);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #252b4a;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
+    animation: slideUp 0.4s ease-out;
 }
 
 .uploaded-file span {
-    color: #ffffff;
+    font-weight: 600;
+    color: var(--color-success);
 }
 
 .uploaded-file ion-icon {
-    color: #ff4757;
+    font-size: 1.5rem;
+    color: var(--color-danger);
     cursor: pointer;
-    font-size: 1.25rem;
+    transition: all 0.3s ease;
 }
 
+.uploaded-file ion-icon:hover {
+    transform: scale(1.2) rotate(90deg);
+}
+
+/* ============================================
+   SUBMIT SECTION
+   ============================================ */
+
 .submit-section {
-    margin-top: 2rem;
+    margin-top: 3rem;
+    text-align: center;
 }
 
 .run-triage-btn {
-    --background: #4c9aff;
-    --background-hover: #3a8aef;
-    --background-activated: #2a7adf;
-    --color: #ffffff;
-    --border-radius: 8px;
-    --padding-top: 1rem;
-    --padding-bottom: 1rem;
-    font-size: 1rem;
-    font-weight: 600;
+    --background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    --background-hover: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    --color: var(--color-text-on-primary);
+    --border-radius: var(--radius-lg);
+    --padding-top: 1.25rem;
+    --padding-bottom: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
     text-transform: none;
+    box-shadow: 0 10px 30px rgba(30, 58, 95, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.run-triage-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.run-triage-btn:hover::before {
+    width: 400px;
+    height: 400px;
+}
+
+.run-triage-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(30, 58, 95, 0.4);
+}
+
+.run-triage-btn:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .intake-container {
+        padding: 2rem 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .custom-title {
+        font-size: 1.25rem;
+    }
+
+    .upload-box {
+        padding: 2rem 1rem;
+    }
+
+    .chip-container {
+        gap: 0.5rem;
+    }
+
+    .chip-unselected,
+    .chip-selected {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .section-icon {
+        font-size: 2rem;
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

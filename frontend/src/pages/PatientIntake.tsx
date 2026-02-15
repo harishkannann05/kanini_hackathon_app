@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    IonContent, IonHeader, IonPage, IonTitle, IonToolbar,
+    IonContent, IonPage,
     IonButton, IonLabel, IonInput, IonSelect, IonSelectOption,
     IonChip, IonIcon, IonGrid, IonRow, IonCol
 } from '@ionic/react';
@@ -128,28 +128,6 @@ const PatientIntake: React.FC = () => {
 
     return (
         <IonPage className="patient-intake-page">
-            <IonHeader>
-                <IonToolbar className="custom-toolbar">
-                    <IonTitle className="custom-title" onClick={() => history.push('/')} style={{ cursor: 'pointer' }}>
-                        <span className="logo-icon">🏥</span> AI Smart Triage
-                    </IonTitle>
-                    <div slot="end" className="nav-buttons">
-                        <IonButton fill="clear" routerLink="/" className="nav-btn">
-                            Home
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/intake" className="active-nav">
-                            Patient Intake
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/dashboard">
-                            Dashboard
-                        </IonButton>
-                        <IonButton fill="clear" routerLink="/doctors">
-                            Doctors
-                        </IonButton>
-                    </div>
-                </IonToolbar>
-            </IonHeader>
-
             <IonContent className="dark-content">
                 <div className="intake-container">
                     <div className="section-header">

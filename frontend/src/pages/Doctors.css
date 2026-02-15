@@ -1,73 +1,251 @@
+/* ============================================
+   DOCTORS PAGE - MEDICAL THEME
+   ============================================ */
+
 .doctors-page {
-    --background: #0a0e27;
+    --background: var(--color-background);
+}
+
+/* ============================================
+   CONTENT AREA
+   ============================================ */
+
+.dark-content {
+    --background: var(--color-background);
 }
 
 .doctors-container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 3rem 2rem;
+    animation: fadeIn 0.5s ease-out;
 }
 
+/* ============================================
+   PAGE TITLE
+   ============================================ */
+
 .page-title {
-    color: #ffffff;
-    font-size: 2rem;
+    font-family: var(--font-family-heading);
+    font-size: 2.5rem;
     font-weight: 800;
-    margin-bottom: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 3rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
+    position: relative;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--color-primary);
+    animation: slideUp 0.6s ease-out;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 150px;
+    height: 3px;
+    background: var(--color-beige);
+    animation: slideRight 0.8s ease-out;
+}
+
+@keyframes slideRight {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 150px;
+    }
+}
+
+.page-title ion-icon {
+    font-size: 3rem;
+    color: var(--color-primary);
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ============================================
+   DOCTOR LIST
+   ============================================ */
+
+.dark-list {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .doctor-item {
-    --background: #1a1f3a;
-    --color: #ffffff;
-    --border-color: #2a2f4a;
-    --padding-start: 1.5rem;
-    --padding-end: 1.5rem;
-    --inner-padding-top: 1rem;
-    --inner-padding-bottom: 1rem;
-    border: 1px solid #2a2f4a;
-    border-radius: 12px;
-    margin-bottom: 1rem;
+    --background: var(--color-surface);
+    --border-color: var(--color-border);
+    --color: var(--color-text-primary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
 }
 
+.doctor-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-secondary) 100%);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.4s ease;
+}
+
+.doctor-item:hover::before {
+    transform: scaleY(1);
+}
+
+.doctor-item:hover {
+    transform: translateX(10px) scale(1.02);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-xl);
+}
+
+.doctor-item::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle,
+            rgba(30, 58, 95, 0.05) 0%,
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.doctor-item:hover::after {
+    opacity: 1;
+}
+
+/* ============================================
+   DOCTOR AVATAR
+   ============================================ */
+
 .doctor-avatar-box {
-    width: 50px;
-    height: 50px;
-    background: rgba(76, 154, 255, 0.1);
-    color: #4c9aff;
-    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-secondary) 100%);
+    color: var(--color-text-on-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    transition: all 0.3s ease;
 }
 
+.doctor-item:hover .doctor-avatar-box {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 18px rgba(30, 58, 95, 0.4);
+}
+
+/* ============================================
+   DOCTOR LABEL
+   ============================================ */
+
 .doctor-label h2 {
-    color: #ffffff;
-    font-size: 1.1rem;
+    font-family: var(--font-family-heading);
+    font-size: 1.5rem;
     font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.doctor-item:hover .doctor-label h2 {
+    color: var(--color-primary);
 }
 
 .doctor-label p {
-    color: #8b92b0;
-    margin: 0.25rem 0;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
 }
 
 .exp-badge {
-    color: #4c9aff !important;
-    font-size: 0.8rem !important;
+    display: inline-block;
+    background: linear-gradient(135deg,
+            rgba(107, 140, 174, 0.1) 0%,
+            rgba(168, 197, 209, 0.1) 100%);
+    color: var(--color-secondary);
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius-full);
     font-weight: 600;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    border: 1px solid var(--color-secondary);
 }
 
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+
 .status-badge {
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
 }
+
+.status-badge:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+ion-badge[color="success"] {
+    --background: var(--color-success);
+    --color: #ffffff;
+}
+
+ion-badge[color="warning"] {
+    --background: var(--color-warning);
+    --color: #ffffff;
+}
+
+ion-badge[color="primary"] {
+    --background: var(--color-primary);
+    --color: #ffffff;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   BACK BUTTON
+   ============================================ */
 
 .back-container {
     margin-top: 3rem;
@@ -75,11 +253,150 @@
 }
 
 .back-btn {
-    --color: #8b92b0;
-    text-transform: none;
+    --color: var(--color-primary);
+    --background-hover: rgba(30, 58, 95, 0.05);
     font-weight: 600;
+    font-size: 1.125rem;
+    text-transform: none;
+    transition: all 0.3s ease;
+    padding: 1rem 2rem;
 }
 
 .back-btn:hover {
-    --color: #ffffff;
+    transform: translateY(-2px);
+    --color: var(--color-secondary);
+}
+
+/* ============================================
+   STAGGERED ANIMATIONS
+   ============================================ */
+
+.doctor-item {
+    animation: slideUp 0.5s ease-out backwards;
+}
+
+.doctor-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.doctor-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.doctor-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.doctor-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.doctor-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.doctor-item:nth-child(n+6) {
+    animation-delay: 0.6s;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.95);
+    }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .doctors-container {
+        padding: 2rem 1rem;
+    }
+
+    .custom-title {
+        font-size: 1.25rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-title ion-icon {
+        font-size: 2.5rem;
+    }
+
+    .doctor-label h2 {
+        font-size: 1.25rem;
+    }
+
+    .doctor-item:hover {
+        transform: translateX(5px) scale(1.01);
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+
+    .doctor-label h2 {
+        font-size: 1.125rem;
+    }
+
+    .doctor-label p {
+        font-size: 0.875rem;
+    }
+
+    .exp-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.625rem;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
