@@ -7,7 +7,7 @@ import {
     menuOutline,
     closeOutline,
     homeOutline,
-    clipboardOutline,
+    // clipboardOutline,
     statsChartOutline,
     peopleOutline
 } from 'ionicons/icons';
@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
 
     const navItems = [
         { path: '/', label: 'Home', icon: homeOutline, show: 'always' },
-        { path: '/intake', label: 'Patient Intake', icon: clipboardOutline, show: 'always' },
+        //{ path: '/intake', label: 'Patient Intake', icon: clipboardOutline, show: 'always' },
         { path: '/doctors', label: 'Doctors', icon: peopleOutline, show: 'always' },
         { path: getDashboardPath(), label: 'Dashboard', icon: statsChartOutline, show: 'authed' },
         { path: '/login', label: 'Login', icon: logInOutline, show: 'unauthed' },

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Medicy</string>
+    <string name="title_activity_main">Medicy</string>
+    <string name="package_name">com.medicy.app</string>
+    <string name="custom_url_scheme">com.medicy.app</string>
+</resources>
