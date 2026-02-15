@@ -1,92 +1,144 @@
+/* Doctor Dashboard Premium Styles */
+
 .doctor-page {
-    --background: #f4f5f8;
+    --background: var(--color-background);
 }
 
 .doctor-content {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
+/* Header */
 .dashboard-header {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     padding: 0 1rem;
+    text-align: center;
 }
 
 .dashboard-header h2 {
-    margin: 0;
-    color: #1a1a1a;
-    font-weight: 700;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .dashboard-header p {
-    margin: 0.5rem 0 0;
-    color: #666;
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
 }
 
+/* Status Indicator */
 .status-indicator {
     display: flex;
     align-items: center;
-    margin-right: 1rem;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 .dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin-right: 6px;
-    background-color: #ccc;
+    margin-right: 0;
 }
 
 .dot.online {
-    background-color: #2dd36f;
-    box-shadow: 0 0 8px #2dd36f;
+    background-color: var(--color-success);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    animation: pulse 2s infinite;
 }
 
 .dot.offline {
-    background-color: #eb445a;
+    background-color: var(--color-danger);
 }
 
+/* Queue List */
 .queue-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
+/* Queue Card Base */
 .queue-card {
-    margin: 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border-left: 4px solid transparent;
-    /* default */
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
+.queue-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-secondary);
+}
+
+/* Active Card Highlight */
 .active-card {
-    border-left: 4px solid #3880ff;
-    background: #fff;
+    background: var(--color-surface);
+    border-left: 6px solid var(--color-primary);
     transform: scale(1.02);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-xl);
+    z-index: 10;
+}
+
+.active-card::before {
+    content: 'CURRENT PATIENT';
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-bottom-left-radius: var(--radius-lg);
+    letter-spacing: 0.5px;
 }
 
 .queue-row {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
+/* Queue Position Number */
 .queue-pos {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #999;
-    width: 3rem;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--color-text-tertiary);
+    opacity: 0.3;
+    min-width: 3rem;
     text-align: center;
 }
 
 .active-card .queue-pos {
-    color: #3880ff;
+    color: var(--color-primary);
+    opacity: 1;
+    text-shadow: 0 2px 10px rgba(30, 58, 95, 0.2);
 }
 
+/* Patient Info */
 .queue-info {
     flex: 1;
 }
@@ -94,45 +146,227 @@
 .patient-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
     margin-bottom: 0.5rem;
 }
 
 .patient-header h4 {
     margin: 0;
+    font-size: 1.25rem;
     font-weight: 700;
-    font-size: 1.1rem;
+    color: var(--color-text-primary);
 }
 
 .patient-details {
     display: flex;
-    gap: 1rem;
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
 }
 
 .patient-details span {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.patient-details ion-icon {
+    color: var(--color-secondary);
 }
 
 .patient-symptoms {
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
     font-style: italic;
+    background: rgba(107, 140, 174, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    display: inline-block;
 }
 
+/* Actions */
 .queue-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    min-width: 140px;
 }
 
-.loading-state,
+.queue-actions ion-button {
+    margin: 0;
+    --border-radius: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 44px;
+}
+
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 3rem;
-    color: #666;
+    padding: 4rem 2rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 2px dashed var(--color-border);
+}
+
+.empty-state p {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    margin-top: 1rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* New Stats Grid Styles */
+.metrics-grid {
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-border);
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.stat-card.blue .stat-icon {
+    background: rgba(0, 70, 135, 0.1);
+    color: var(--color-primary);
+}
+
+.stat-card.orange .stat-icon {
+    background: rgba(243, 112, 33, 0.1);
+    color: var(--color-secondary);
+}
+
+.stat-card.teal .stat-icon {
+    background: rgba(0, 206, 201, 0.1);
+    color: var(--color-accent);
+    /* or teal variable if exists */
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-content h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 0;
+    line-height: 1.1;
+}
+
+.stat-content p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.header-greeting {
+    text-align: left;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border-left: 5px solid var(--color-secondary);
+}
+
+.header-greeting h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.header-greeting p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-weight: 500;
+}
+
+.queue-section-header {
+    margin: 3rem 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.queue-section-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+.queue-section-header p {
+    margin: 0;
+    color: var(--color-text-tertiary);
+    font-size: 0.9rem;
 }

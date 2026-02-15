@@ -33,6 +33,9 @@ async def create_visit_orchestration(db: AsyncSession, payload_dict: dict):
     # ── 3. Create or Fetch Patient ──
     if payload_dict.get("patient_id"):
         patient_id = payload_dict["patient_id"]
+        # Coerce to UUID if string
+        if isinstance(patient_id, str):
+            patient_id = uuid.UUID(patient_id)
         # Update mutable fields
         stmt = update(Patient).where(Patient.patient_id == patient_id).values(
             age=payload_dict["age"],
@@ -110,7 +113,7 @@ async def create_visit_orchestration(db: AsyncSession, payload_dict: dict):
         visit_id=visit_id,
         risk_score=triage_result["risk_score"],
         risk_level=triage_result["risk_level"],
-        recommended_department=str(dept_uuid) if dept_uuid else None,
+        recommended_department=dept_uuid,  # Pass UUID object directly
         confidence_score=triage_result["confidence"],
         model_version=triage_result["model_version"],
         shap_explanation=triage_result["shap_explanation"],
@@ -131,15 +134,21 @@ async def create_visit_orchestration(db: AsyncSession, payload_dict: dict):
     doctor_id = None
     if payload_dict.get("manual_doctor_id"):
         doctor_id = payload_dict["manual_doctor_id"]
+        # Coerce to UUID if string
+        if isinstance(doctor_id, str):
+            doctor_id = uuid.UUID(doctor_id)
         # Verify doctor exists?
     else:
         use_preferred = payload_dict.get("use_preferred_doctor", True)
-        doctor_id, _ = await assign_doctor(
+        doctor_id_str, _ = await assign_doctor(
             db,
             dept_name,
             triage_result["risk_level"],
-            patient_id if use_preferred else None,
+            str(patient_id) if use_preferred else None,
         )
+        # Convert returned string to UUID
+        if doctor_id_str:
+            doctor_id = uuid.UUID(doctor_id_str)
 
     if doctor_id:
         new_assignment = DoctorAssignment(
@@ -153,8 +162,8 @@ async def create_visit_orchestration(db: AsyncSession, payload_dict: dict):
     queue_position = 0
     wait_minutes = 0
     if doctor_id:
-        queue_position = await insert_into_queue(db, visit_id, doctor_id, triage_result)
-        wait_minutes = await estimate_wait_time(db, visit_id, doctor_id)
+        queue_position = await insert_into_queue(db, str(visit_id), str(doctor_id), triage_result)
+        wait_minutes = await estimate_wait_time(db, str(visit_id), str(doctor_id))
 
     # Return result
     return {

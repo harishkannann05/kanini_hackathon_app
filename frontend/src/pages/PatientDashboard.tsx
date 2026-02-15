@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-    IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-    IonCard, IonCardContent, IonCardHeader, IonCardTitle,
+    IonContent, IonPage, IonCard, IonCardContent, IonCardHeader, IonCardTitle,
     IonNote, IonIcon, IonBadge, IonGrid, IonRow, IonCol
 } from '@ionic/react';
-import { personOutline, timeOutline, logOutOutline } from 'ionicons/icons';
+import { personOutline, timeOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import api from '../api';
 import './PatientDashboard.css';
@@ -51,19 +50,7 @@ const PatientDashboard: React.FC = () => {
 
     return (
         <IonPage className="patient-page">
-            <IonHeader>
-                <IonToolbar color="success">
-                    <IonTitle>My Health Portal</IonTitle>
-                    <IonButtons slot="end">
-                        <IonButton onClick={() => {
-                            localStorage.clear();
-                            history.replace('/login');
-                        }}>
-                            <IonIcon icon={logOutOutline} />
-                        </IonButton>
-                    </IonButtons>
-                </IonToolbar>
-            </IonHeader>
+
 
             <IonContent className="ion-padding">
                 {loading ? (
@@ -72,6 +59,7 @@ const PatientDashboard: React.FC = () => {
                     <div className="center-msg error">{error}</div>
                 ) : (
                     <div className="dashboard-container">
+                        <h1 className="page-title">My Health Portal</h1>
                         <IonCard className="profile-card">
                             <IonCardContent>
                                 <div className="profile-header">

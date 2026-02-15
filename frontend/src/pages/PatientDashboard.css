@@ -1,143 +1,237 @@
+/* Patient Dashboard Premium Styles */
+
 .patient-page {
-    --background: #f0fdf4;
+    --background: var(--color-background);
 }
 
-.dashboard-container {
-    max-width: 600px;
+.patient-content {
+    max-width: 900px;
     margin: 0 auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
-.center-msg {
-    text-align: center;
-    margin-top: 3rem;
-    color: #666;
-}
-
-.center-msg.error {
-    color: #eb445a;
-}
-
-.profile-card {
-    background: linear-gradient(135deg, #2dd36f 0%, #28ba62 100%);
-    color: white;
-    border-radius: 16px;
+/* Page Title */
+.page-title {
     margin-bottom: 2rem;
+    padding-left: 0.5rem;
+    color: var(--color-primary);
+}
+
+/* Profile Card */
+.profile-card {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(30, 58, 95, 0.2);
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(30, 58, 95, 0.3);
+}
+
+.profile-card::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 0;
 }
 
 .profile-header {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .avatar-circle {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 2.5rem;
+    color: white;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .profile-text h2 {
-    margin: 0;
-    font-size: 1.4rem;
+    font-size: 2rem;
     font-weight: 700;
+    margin: 0;
     color: white;
 }
 
 .profile-text p {
-    margin: 0.2rem 0 0.5rem;
+    font-size: 1rem;
+    margin: 0.5rem 0 0;
     color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.section-title {
-    margin-left: 0.5rem;
-    color: #1a1a1a;
+.profile-text ion-icon {
+    font-size: 1.25rem;
+}
+
+/* Stats Section */
+.stats-grid {
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    color: white;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border: none;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+}
+
+.stat-card.blue {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.stat-card.purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.stat-metric {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
     font-weight: 600;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Visit History */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 1.5rem;
+    padding-left: 0.5rem;
+    border-left: 4px solid var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .visit-card {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    padding: 0;
+    /* Let content handle padding */
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.visit-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-light);
 }
 
 .visit-header-row {
+    background: var(--color-background);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+}
+
+.visit-date {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+}
+
+.visit-status {
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+}
+
+.visit-card ion-card-content {
+    padding: 1.5rem;
 }
 
 .visit-detail-row {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #666;
+    gap: 2rem;
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
 }
 
 .visit-detail-row span {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 0.5rem;
 }
 
-.stats-grid {
-    padding: 0;
-    margin-bottom: 1rem;
+.visit-detail-row ion-icon {
+    color: var(--color-secondary);
 }
 
-.stat-card {
-    margin: 0;
+/* Empty State */
+.empty-history {
     text-align: center;
-    border-radius: 12px;
-    color: white;
+    padding: 4rem 2rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-tertiary);
+    border: 2px dashed var(--color-border);
 }
 
-.stat-card.blue {
-    background: #3880ff;
-}
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
 
-.stat-card.purple {
-    background: #7044ff;
-}
-
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.stat-label {
-    font-size: 0.75rem;
-    opacity: 0.9;
-}
-
-.visit-score-container {
-    margin-top: 10px;
-}
-
-.score-bar {
-    height: 6px;
-    background: #e0e0e0;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 4px;
-}
-
-.score-fill {
-    height: 100%;
-}
-
-.score-text {
-    font-size: 0.8rem;
-    color: #888;
-}
-
-.visit-score {
-    font-size: 0.85rem;
-    color: #999;
-    text-align: right;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

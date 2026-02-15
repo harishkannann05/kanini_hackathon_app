@@ -59,7 +59,6 @@ const Doctors: React.FC = () => {
 
     return (
         <IonPage className="doctors-page">
-
             <IonContent className="dark-content">
                 <div className="doctors-container">
                     <h1 className="page-title">
@@ -77,33 +76,16 @@ const Doctors: React.FC = () => {
                         <IonList className="dark-list">
                             {doctors.map(doc => (
                                 <IonItem key={doc.doctor_id} className="doctor-item" lines="none">
-                                <IonAvatar slot="start">
-                                    <div className="doctor-avatar-box">
-                                        Dr
-                                    </div>
-                                </IonAvatar>
-                                <IonLabel className="doctor-label">
-                                    <h2>Dr. {doc.specialization}</h2>
-                                    <p>{doc.department_name}</p>
-                                    <p className="exp-badge">{doc.experience_years} Years Experience</p>
-                                </IonLabel>
-<<<<<<< HEAD
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    {doc._live_activity && (
-                                        <IonBadge color="primary">Live</IonBadge>
-                                    )}
-                                    <IonBadge
-                                        slot="end"
-                                        className="status-badge"
-                                        color={doc.is_available ? 'success' : 'warning'}
-                                    >
-                                        {doc.is_available ? 'Available' : 'Busy'}
-                                    </IonBadge>
-                                </div>
-                            </IonItem>
-                        ))}
-                    </IonList>
-=======
+                                    <IonAvatar slot="start">
+                                        <div className="doctor-avatar-box">
+                                            Dr
+                                        </div>
+                                    </IonAvatar>
+                                    <IonLabel className="doctor-label">
+                                        <h2>Dr. {doc.specialization}</h2>
+                                        <p>{doc.department_name}</p>
+                                        <p className="exp-badge">{doc.experience_years} Years Experience</p>
+                                    </IonLabel>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                         {doc._live_activity && (
                                             <IonBadge color="primary">Live</IonBadge>
@@ -120,7 +102,6 @@ const Doctors: React.FC = () => {
                             ))}
                         </IonList>
                     )}
->>>>>>> 4803b6e01fb4d333d54e319edc785f55d3b8bfad
 
                     <div className="back-container">
                         <IonButton
@@ -138,3 +119,4 @@ const Doctors: React.FC = () => {
 };
 
 export default Doctors;
+

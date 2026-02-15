@@ -79,7 +79,7 @@ async def run_import(force: bool = False):
                 "Base_Severity": "base_severity",
                 "Emergency_Trigger": "emergency_trigger",
                 "Associated_Department": "associated_department",
-                "Possible_Linked_Conditions": "possible_linked_conditions",
+                # "Possible_Linked_Conditions": "possible_linked_conditions",  # Not in model
                 "Typical_Duration_Days": "typical_duration_days",
             }
             count2 = await import_table(df2, SymptomSeverity, mapping2, session)

@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { IonIcon } from '@ionic/react';
 import {
+    logInOutline,
+    logOutOutline,
+    menuOutline,
+    closeOutline,
     homeOutline,
     clipboardOutline,
     statsChartOutline,
-    peopleOutline,
-    menuOutline,
-    closeOutline,
-    medkitOutline
+    peopleOutline
 } from 'ionicons/icons';
+import medicyLogo from '../assets/medicy_logo.png';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
@@ -38,6 +40,8 @@ const Navbar: React.FC = () => {
         { path: '/intake', label: 'Patient Intake', icon: clipboardOutline },
         { path: '/dashboard', label: 'Dashboard', icon: statsChartOutline },
         { path: '/doctors', label: 'Doctors', icon: peopleOutline },
+        { path: '/login', label: 'Login', icon: logInOutline },
+        { path: 'logout', label: 'Logout', icon: logOutOutline },
     ];
 
     const isActive = (path: string) => {
@@ -45,7 +49,12 @@ const Navbar: React.FC = () => {
     };
 
     const handleNavigation = (path: string) => {
-        history.push(path);
+        if (path === 'logout') {
+            localStorage.clear();
+            history.push('/login');
+        } else {
+            history.push(path);
+        }
         setMobileMenuOpen(false);
     };
 
@@ -54,14 +63,11 @@ const Navbar: React.FC = () => {
             <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
                 <div className="navbar-container">
                     {/* Logo */}
-                    <div className="navbar-logo" onClick={() => handleNavigation('/')}>
-                        <div className="logo-icon-wrapper">
-                            <IonIcon icon={medkitOutline} className="logo-icon" />
+                    <div className="navbar-brand" onClick={() => history.push('/')}>
+                        <div className="brand-logo-wrapper">
+                            <img src={medicyLogo} alt="Medicy" className="brand-logo-img" />
                         </div>
-                        <div className="logo-text">
-                            <span className="logo-title">AI Smart Triage</span>
-                            <span className="logo-subtitle">Healthcare Intelligence</span>
-                        </div>
+                        <span className="brand-text">Medicy</span>
                     </div>
 
                     {/* Desktop Navigation */}

@@ -186,15 +186,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         raise credentials_exception
         
     if db is not None:
-        stmt = select(User).where(User.user_id == user_id)
-        result = await db.execute(stmt)
-        user = result.scalars().first()
-        if user:
-            return {
-                "user_id": str(user.user_id),
-                "role": user.role,
-                "full_name": user.full_name,
-                "email": user.email,
-            }
+        try:
+            user_uuid = uuid.UUID(user_id)
+            stmt = select(User).where(User.user_id == user_uuid)
+            result = await db.execute(stmt)
+            user = result.scalars().first()
+            if user:
+                return {
+                    "user_id": str(user.user_id),
+                    "role": user.role,
+                    "full_name": user.full_name,
+                    "email": user.email,
+                }
+        except (ValueError, TypeError):
+            pass
 
     return {"user_id": user_id, "role": role}

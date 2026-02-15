@@ -6,20 +6,25 @@
 
 :root {
   /* Medical Color Palette */
-  --color-navy-dark: #1e3a5f;
-  --color-slate-blue: #6b8cae;
-  --color-light-blue: #a8c5d1;
-  --color-beige: #e8dcc4;
+  /* Apollo Hospitals Theme */
+  --color-navy-dark: #004687;
+  --color-orange-accent: #f37021;
+  --color-teal-light: #00cec9;
+  --color-purple: #6c5ce7;
 
   /* Semantic Colors */
-  --color-primary: #1e3a5f;
-  --color-primary-light: #2d4f7c;
-  --color-primary-dark: #152944;
-  --color-secondary: #6b8cae;
-  --color-accent: #a8c5d1;
-  --color-background: #f5f7fa;
+  --color-primary: #004687;
+  /* Apollo Blue */
+  --color-primary-light: #005bb5;
+  --color-primary-dark: #002e5d;
+  --color-secondary: #f37021;
+  /* Apollo Orange (using as secondary/action) */
+  --color-accent: #00cec9;
+  /* Teal for medical/fresh feel */
+  --color-background: #f8f9fa;
+  /* Clean Medical Light Gray */
   --color-surface: #ffffff;
-  --color-surface-alt: #e8dcc4;
+  --color-surface-alt: #f1f2f6;
 
   /* Status Colors */
   --color-success: #10b981;

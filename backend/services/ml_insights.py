@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime, timedelta
 import re
+import uuid
 from typing import List, Dict
 
 # Critical keywords to highlight
@@ -38,8 +39,14 @@ async def extract_key_insights(db: AsyncSession, patient_id: str) -> Dict:
     }
     """
     
+    # Convert patient_id to UUID
+    try:
+        patient_id_uuid = uuid.UUID(patient_id)
+    except (ValueError, TypeError):
+        return {"error": "Invalid patient_id format"}
+    
     # Fetch patient data
-    patient_stmt = select(Patient).where(Patient.patient_id == patient_id)
+    patient_stmt = select(Patient).where(Patient.patient_id == patient_id_uuid)
     patient_result = await db.execute(patient_stmt)
     patient = patient_result.scalars().first()
     
@@ -51,8 +58,8 @@ async def extract_key_insights(db: AsyncSession, patient_id: str) -> Dict:
     records_stmt = (
         select(MedicalRecord)
         .join(Visit, MedicalRecord.visit_id == Visit.visit_id)
-        .where(Visit.patient_id == patient_id)
-       .where(MedicalRecord.created_at >= six_months_ago)
+        .where(Visit.patient_id == patient_id_uuid)
+        .where(MedicalRecord.created_at >= six_months_ago)
         .order_by(MedicalRecord.created_at.desc())
     )
     records_result = await db.execute(records_stmt)

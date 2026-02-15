@@ -18,6 +18,12 @@ async def record_doctor_preference(
     """
     from sqlalchemy import select, update
     
+    # Coerce to UUID
+    if isinstance(patient_id, str):
+        patient_id = uuid.UUID(patient_id)
+    if isinstance(doctor_id, str):
+        doctor_id = uuid.UUID(doctor_id)
+    
     # Check if preference already exists
     stmt = select(PatientPreference).where(
         PatientPreference.patient_id == patient_id,
@@ -36,7 +42,7 @@ async def record_doctor_preference(
     else:
         # Create new preference
         new_pref = PatientPreference(
-            preference_id=str(uuid.uuid4()),
+            preference_id=uuid.uuid4(),
             patient_id=patient_id,
             preferred_doctor=doctor_id
         )

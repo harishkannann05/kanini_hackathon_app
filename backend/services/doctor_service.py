@@ -1,10 +1,10 @@
-"""
-Doctor Assignment Service — Finds best available doctor for a department.
+"""Doctor Assignment Service — Finds best available doctor for a department.
 Uses UUID-based doctor_id and department_id from the app schema.
 """
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from models import Doctor, DoctorAssignment, Department
+import uuid
 
 
 async def get_department_id(db: AsyncSession, department_name: str) -> str | None:
@@ -29,6 +29,12 @@ async def get_patient_preferred_doctor(
     Returns doctor_id if preference exists and doctor is available.
     """
     from models import PatientPreference
+    
+    # Coerce to UUID
+    if isinstance(patient_id, str):
+        patient_id = uuid.UUID(patient_id)
+    if isinstance(department_id, str):
+        department_id = uuid.UUID(department_id)
     
     stmt = (
         select(Doctor.doctor_id)
@@ -71,6 +77,9 @@ async def assign_doctor(
         if not dept_id:
             return None, None
 
+    # Convert dept_id to UUID for database queries
+    dept_id_uuid = uuid.UUID(dept_id)
+
     # 1. Check patient preference first
     if patient_id:
         preferred_doc = await get_patient_preferred_doctor(db, patient_id, dept_id)
@@ -97,7 +106,7 @@ async def assign_doctor(
         )
         .outerjoin(load_subq, Doctor.doctor_id == load_subq.c.doctor_id)
         .where(
-            Doctor.department_id == dept_id,
+            Doctor.department_id == dept_id_uuid,
             Doctor.is_available == True
         )
     )

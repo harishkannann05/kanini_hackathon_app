@@ -15,6 +15,7 @@ import shutil
 import traceback
 import logging
 from typing import Optional
+from contextlib import asynccontextmanager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,31 +43,37 @@ JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret")
 JWT_ALGO = "HS256"
 
 
-
-app = FastAPI(title="AI Smart Patient Triage", version="2.0.0")
-
-# CORS Configuration - Allow frontend to make requests
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Frontend URLs
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers
-)
-
-
-@app.on_event("startup")
-async def startup_event():
-    # Ensure SQLite tables exist and seed departments/doctors if needed.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Starting up application...")
     await init_db()
     try:
         from scripts.migrate_db import seed_departments_and_doctors
         await seed_departments_and_doctors()
     except Exception as e:
         logger.warning(f"Startup seed skipped: {e}")
-
-    # ML models are auto-loaded when the triage_service module is imported
+    
     logger.info("Application started successfully")
+    
+    # ML models are auto-loaded when the triage_service module is imported
+    
+    yield
+    
+    # Shutdown (if needed)
+    logger.info("Shutting down application...")
+
+
+app = FastAPI(title="AI Smart Patient Triage", version="2.0.0", lifespan=lifespan)
+
+# CORS Configuration - Allow frontend to make requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"],  # Frontend URLs
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # ── Serve static UI ───────────────────────────────────────────
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "templates")
@@ -147,8 +154,14 @@ async def upload_document(file: UploadFile = File(...)):
 # ══════════════════════════════════════════════════════════════
 @app.post("/visits/{visit_id}/override")
 async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = Depends(get_db)):
+    # Convert visit_id string to UUID
+    try:
+        visit_id_uuid = uuid.UUID(visit_id)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid visit_id format")
+    
     async with db.begin():
-        stmt = select(AIAssessment).where(AIAssessment.visit_id == visit_id)
+        stmt = select(AIAssessment).where(AIAssessment.visit_id == visit_id_uuid)
         result = await db.execute(stmt)
         assessment = result.scalars().first()
         if not assessment:
@@ -158,7 +171,7 @@ async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = 
         assessment.risk_level = req.new_risk_level
 
         # Update queue priority
-        queue_stmt = select(Queue).where(Queue.visit_id == visit_id)
+        queue_stmt = select(Queue).where(Queue.visit_id == visit_id_uuid)
         queue_result = await db.execute(queue_stmt)
         queue_entry = queue_result.scalars().first()
         doctor_id = None
@@ -172,7 +185,7 @@ async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = 
             log_id=str(uuid.uuid4()),
             action="risk_override",
             target_table="ai_assessments",
-            target_id=visit_id,
+            target_id=str(visit_id_uuid),
         )
         db.add(audit)
 
@@ -183,7 +196,7 @@ async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = 
                 "queue": queue_list
             })
 
-    return {"status": "ok", "visit_id": visit_id, "old_risk": old_risk, "new_risk": req.new_risk_level}
+    return {"status": "ok", "visit_id": str(visit_id_uuid), "old_risk": old_risk, "new_risk": req.new_risk_level}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -334,25 +347,27 @@ async def get_current_user_profile(current_user: dict = Depends(get_current_user
 async def get_master_symptoms(q: Optional[str] = None, db: AsyncSession = Depends(get_db)):
     """Fetch symptom suggestions for autocomplete."""
     from models import SymptomSeverity
-    stmt = select(SymptomSeverity)
-    if q:
-        stmt = stmt.where(SymptomSeverity.symptom_name.ilike(f"%{q}%"))
-    stmt = stmt.limit(20)
-    result = await db.execute(stmt)
-    symptoms = result.scalars().all()
-    return [{"name": s.symptom_name, "severity": s.base_severity} for s in symptoms]
+    async with db.begin():
+        stmt = select(SymptomSeverity)
+        if q:
+            stmt = stmt.where(SymptomSeverity.symptom_name.ilike(f"%{q}%"))
+        stmt = stmt.limit(20)
+        result = await db.execute(stmt)
+        symptoms = result.scalars().all()
+        return [{"name": s.symptom_name, "severity": s.base_severity} for s in symptoms]
 
 
 @app.get("/master/chronic-conditions")
 async def get_master_chronic_conditions(q: Optional[str] = None, db: AsyncSession = Depends(get_db)):
     """Fetch chronic condition suggestions for autocomplete."""
-    stmt = select(ChronicCondition)
-    if q:
-        stmt = stmt.where(ChronicCondition.chronic_condition.ilike(f"%{q}%"))
-    stmt = stmt.limit(20)
-    result = await db.execute(stmt)
-    conditions = result.scalars().all()
-    return [{"name": c.chronic_condition, "risk_modifier": c.risk_modifier_score} for c in conditions]
+    async with db.begin():
+        stmt = select(ChronicCondition)
+        if q:
+            stmt = stmt.where(ChronicCondition.chronic_condition.ilike(f"%{q}%"))
+        stmt = stmt.limit(20)
+        result = await db.execute(stmt)
+        conditions = result.scalars().all()
+        return [{"name": c.chronic_condition, "risk_modifier": c.risk_modifier_score} for c in conditions]
 
 
 @app.get("/departments")

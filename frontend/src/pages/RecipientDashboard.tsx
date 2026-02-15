@@ -203,19 +203,10 @@ const RecipientDashboard: React.FC = () => {
 
     return (
         <IonPage className="recipient-page">
-            <IonHeader>
-                <IonToolbar color="tertiary">
-                    <IonTitle>Triage Officer Dashboard</IonTitle>
-                    <IonButtons slot="end">
-                        <IonButton onClick={() => {
-                            localStorage.clear();
-                            history.replace('/login');
-                        }}>Logout</IonButton>
-                    </IonButtons>
-                </IonToolbar>
-            </IonHeader>
+
 
             <IonContent className="ion-padding">
+                <h1 className="page-title">Triage Officer Dashboard</h1>
                 <IonSegment value={segment} onIonChange={(e: any) => setSegment(e.detail.value as any)} className="role-segment">
                     <IonSegmentButton value="search">
                         <IonLabel>Search Patient</IonLabel>

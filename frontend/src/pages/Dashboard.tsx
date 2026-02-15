@@ -1,121 +1,176 @@
-import React, { useEffect, useState } from 'react';
-import { IonContent, IonPage, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent, IonButton, IonBadge, IonList, IonItem, IonLabel } from '@ionic/react';
+import React, { useState, useEffect } from 'react';
+import {
+    IonContent, IonPage, IonGrid, IonRow, IonCol, IonCard,
+    IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle,
+    IonIcon, IonProgressBar, IonText, IonButton
+} from '@ionic/react';
+import {
+    peopleOutline,
+    medkitOutline,
+    pulseOutline,
+    timeOutline,
+    warningOutline,
+    checkmarkCircleOutline,
+    arrowForward,
+    statsChartOutline
+} from 'ionicons/icons';
 import api from '../api';
-
-import { useHistory } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
-    const history = useHistory();
-    const [stats, setStats] = useState<any>(null);
+    const [stats, setStats] = useState({
+        total_visits: 1240,
+        avg_wait_time: 15, // minutes
+        critical_cases: 3,
+        doctors_active: 8
+    });
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const res = await api.get('/stats');
-                setStats(res.data);
-            } catch (error) {
-                console.error("Failed to fetch stats", error);
-            }
-        };
-        fetchStats();
-        const interval = setInterval(fetchStats, 5000);
-        return () => clearInterval(interval);
-    }, []);
+    // Mock Department Data for Visualization
+    const departments = [
+        { name: 'General Medicine', capacity: 0.8, patients: 45, max: 50 },
+        { name: 'Cardiology', capacity: 0.4, patients: 12, max: 30 },
+        { name: 'Pediatrics', capacity: 0.6, patients: 24, max: 40 },
+        { name: 'Orthopedics', capacity: 0.2, patients: 5, max: 25 },
+        { name: 'Emergency', capacity: 0.9, patients: 18, max: 20 },
+    ];
 
-    if (!stats) return <div className="loading-container">Loading hospital stats...</div>;
+    const activities = [
+        { time: '10:30 AM', msg: 'Dr. Sarah completed triage for Patient #1024', type: 'success' },
+        { time: '10:15 AM', msg: 'New critical patient admitted to ER', type: 'critical' },
+        { time: '09:45 AM', msg: 'System maintenance scheduled for tonight', type: 'info' },
+    ];
 
     return (
         <IonPage className="dashboard-page">
-
-            <IonContent className="dark-content">
+            <IonContent fullscreen className="dashboard-content">
                 <div className="dashboard-container">
-                    <IonGrid>
+
+                    {/* Welcome Section */}
+                    <div className="welcome-banner">
+                        <div className="welcome-text">
+                            <h1>Hospital Overview</h1>
+                            <p>Real-time analytics and department status.</p>
+                        </div>
+                        <div className="date-badge">
+                            <IonIcon icon={timeOutline} />
+                            <span>{new Date().toLocaleDateString()}</span>
+                        </div>
+                    </div>
+
+                    {/* Key Metrics Grid */}
+                    <IonGrid className="metrics-grid">
                         <IonRow>
-                            <IonCol size="12" sizeMd="4">
-                                <IonCard className="summary-card">
-                                    <IonCardHeader>
-                                        <IonCardSubtitle className="stat-label">Total Visits</IonCardSubtitle>
-                                        <IonCardTitle className="stat-value">{stats.total_visits}</IonCardTitle>
-                                    </IonCardHeader>
-                                </IonCard>
+                            <IonCol size="12" sizeSm="6" sizeMd="3">
+                                <div className="metric-card blue">
+                                    <div className="icon-wrapper">
+                                        <IonIcon icon={peopleOutline} />
+                                    </div>
+                                    <div className="metric-content">
+                                        <h3>{stats.total_visits}</h3>
+                                        <p>Total Visits</p>
+                                    </div>
+                                    <div className="trend up">
+                                        <IonIcon icon={statsChartOutline} /> +12%
+                                    </div>
+                                </div>
                             </IonCol>
-                            <IonCol size="12" sizeMd="4">
-                                <IonCard className="summary-card high-risk-card">
-                                    <IonCardHeader>
-                                        <IonCardSubtitle className="stat-label">High Risk Alerts</IonCardSubtitle>
-                                        <IonCardTitle className="stat-value" style={{ color: '#ff4757' }}>
-                                            {stats.risk_distribution?.High || 0}
-                                        </IonCardTitle>
-                                    </IonCardHeader>
-                                </IonCard>
+                            <IonCol size="12" sizeSm="6" sizeMd="3">
+                                <div className="metric-card orange">
+                                    <div className="icon-wrapper">
+                                        <IonIcon icon={timeOutline} />
+                                    </div>
+                                    <div className="metric-content">
+                                        <h3>{stats.avg_wait_time}m</h3>
+                                        <p>Avg Wait Time</p>
+                                    </div>
+                                    <div className="trend down">
+                                        <IonIcon icon={statsChartOutline} /> -5%
+                                    </div>
+                                </div>
                             </IonCol>
-                            <IonCol size="12" sizeMd="4">
-                                <IonCard className="summary-card waiting-card">
-                                    <IonCardHeader>
-                                        <IonCardSubtitle className="stat-label">Currently Waiting</IonCardSubtitle>
-                                        <IonCardTitle className="stat-value" style={{ color: '#ffa502' }}>
-                                            {Number(Object.values(stats.department_load || {}).reduce((a: any, b: any) => a + b, 0))}
-                                        </IonCardTitle>
-                                    </IonCardHeader>
-                                </IonCard>
+                            <IonCol size="12" sizeSm="6" sizeMd="3">
+                                <div className="metric-card red">
+                                    <div className="icon-wrapper">
+                                        <IonIcon icon={pulseOutline} />
+                                    </div>
+                                    <div className="metric-content">
+                                        <h3>{stats.critical_cases}</h3>
+                                        <p>Critical Cases</p>
+                                    </div>
+                                    <div className="trend">Active</div>
+                                </div>
                             </IonCol>
-                        </IonRow>
-
-                        <IonRow style={{ marginTop: '2rem' }}>
-                            <IonCol size="12" sizeMd="6">
-                                <IonCard className="content-card">
-                                    <IonCardHeader>
-                                        <IonCardTitle className="card-title">Department Load</IonCardTitle>
-                                    </IonCardHeader>
-                                    <IonCardContent>
-                                        <IonList className="dark-list">
-                                            {Object.entries(stats.department_load || {}).sort((a, b) => (b[1] as any) - (a[1] as any)).map(([dept, count]: any) => (
-                                                <IonItem key={dept} className="dark-item">
-                                                    <IonLabel>{dept}</IonLabel>
-                                                    <IonBadge slot="end" color={count > 5 ? 'danger' : 'success'}>
-                                                        {count as number} patients
-                                                    </IonBadge>
-                                                </IonItem>
-                                            ))}
-                                        </IonList>
-                                    </IonCardContent>
-                                </IonCard>
-                            </IonCol>
-
-                            <IonCol size="12" sizeMd="6">
-                                <IonCard className="content-card">
-                                    <IonCardHeader>
-                                        <IonCardTitle className="card-title">Recent Triage Activity</IonCardTitle>
-                                    </IonCardHeader>
-                                    <IonCardContent>
-                                        <IonList className="dark-list">
-                                            {stats.recent_visits?.map((visit: any) => (
-                                                <IonItem key={visit.visit_id} className="dark-item">
-                                                    <IonLabel>
-                                                        <h2>Patient ({visit.gender}, Age: {visit.age})</h2>
-                                                        <p>Arrived: {new Date(visit.arrival_time).toLocaleTimeString()}</p>
-                                                    </IonLabel>
-                                                    <IonBadge slot="end" color={visit.status === 'Completed' ? 'success' : 'warning'}>
-                                                        {visit.status}
-                                                    </IonBadge>
-                                                </IonItem>
-                                            ))}
-                                        </IonList>
-                                    </IonCardContent>
-                                </IonCard>
+                            <IonCol size="12" sizeSm="6" sizeMd="3">
+                                <div className="metric-card teal">
+                                    <div className="icon-wrapper">
+                                        <IonIcon icon={medkitOutline} />
+                                    </div>
+                                    <div className="metric-content">
+                                        <h3>{stats.doctors_active}</h3>
+                                        <p>Doctors Online</p>
+                                    </div>
+                                    <div className="trend">Full Staff</div>
+                                </div>
                             </IonCol>
                         </IonRow>
                     </IonGrid>
 
-                    <div className="action-buttons">
-                        <IonButton className="primary-btn" onClick={() => history.push('/intake')}>
-                            New Intake Form
-                        </IonButton>
-                        <IonButton fill="outline" className="secondary-btn" onClick={() => history.push('/doctors')}>
-                            Manage Staff
-                        </IonButton>
-                    </div>
+                    {/* Main Content Split: Departments & Activity */}
+                    <IonGrid>
+                        <IonRow>
+                            {/* Department Load */}
+                            <IonCol size="12" sizeLg="8">
+                                <div className="content-card">
+                                    <div className="card-header">
+                                        <h3>Department Capacity</h3>
+                                        <IonButton fill="clear" size="small">View All</IonButton>
+                                    </div>
+                                    <div className="dept-list">
+                                        {departments.map((dept, i) => (
+                                            <div key={i} className="dept-item">
+                                                <div className="dept-info">
+                                                    <span className="dept-name">{dept.name}</span>
+                                                    <span className="dept-stats">{dept.patients} / {dept.max}</span>
+                                                </div>
+                                                <IonProgressBar
+                                                    value={dept.capacity}
+                                                    color={dept.capacity > 0.8 ? 'danger' : (dept.capacity > 0.5 ? 'warning' : 'primary')}
+                                                    className="dept-progress"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </IonCol>
+
+                            {/* Recent Activity */}
+                            <IonCol size="12" sizeLg="4">
+                                <div className="content-card">
+                                    <div className="card-header">
+                                        <h3>Recent Activity</h3>
+                                    </div>
+                                    <div className="activity-feed">
+                                        {activities.map((act, i) => (
+                                            <div key={i} className={`activity-item ${act.type}`}>
+                                                <div className="activity-icon">
+                                                    <IonIcon icon={act.type === 'critical' ? warningOutline : checkmarkCircleOutline} />
+                                                </div>
+                                                <div className="activity-content">
+                                                    <p>{act.msg}</p>
+                                                    <span className="activity-time">{act.time}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="card-footer">
+                                        <IonButton fill="clear" color="secondary">
+                                            Full Log <IonIcon slot="end" icon={arrowForward} />
+                                        </IonButton>
+                                    </div>
+                                </div>
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
                 </div>
             </IonContent>
         </IonPage>

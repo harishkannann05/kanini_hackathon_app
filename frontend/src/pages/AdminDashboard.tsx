@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-    IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle,
+    IonContent, IonPage, IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle,
     IonList, IonItem, IonLabel, IonNote, IonIcon, IonBadge
 } from '@ionic/react';
-import { statsChartOutline, peopleOutline, gitNetworkOutline, logOutOutline } from 'ionicons/icons';
+import { statsChartOutline, peopleOutline, gitNetworkOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import api from '../api';
 import './AdminDashboard.css';
@@ -30,25 +29,14 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <IonPage className="admin-page">
-            <IonHeader>
-                <IonToolbar color="dark">
-                    <IonTitle>System Administration</IonTitle>
-                    <IonButtons slot="end">
-                        <IonButton onClick={() => {
-                            localStorage.clear();
-                            history.replace('/login');
-                        }}>
-                            <IonIcon icon={logOutOutline} />
-                        </IonButton>
-                    </IonButtons>
-                </IonToolbar>
-            </IonHeader>
+
 
             <IonContent className="ion-padding">
                 {loading ? (
                     <div className="loading-state">Loading Analytics...</div>
                 ) : stats && (
                     <div className="admin-content">
+                        <h1 className="page-title">System Administration</h1>
                         {/* Summary Cards */}
                         <IonGrid>
                             <IonRow>

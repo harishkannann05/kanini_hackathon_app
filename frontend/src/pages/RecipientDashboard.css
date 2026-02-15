@@ -1,77 +1,223 @@
-/* RecipientDashboard.css */
+/* Recipient Dashboard Premium Styles */
 
 .recipient-page {
-    --ion-background-color: #f8f9fa;
+    --background: var(--color-background);
 }
 
+.recipient-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Page Title */
+.page-title {
+    margin-bottom: 2rem;
+}
+
+/* Segment Control */
 .role-segment {
-    margin-bottom: 20px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 0.25rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
 }
 
-.custom-search {
-    border-radius: 12px;
-    margin-bottom: 10px;
+.role-segment ion-segment-button {
+    --color: var(--color-text-secondary);
+    --color-checked: var(--color-primary);
+    --indicator-color: transparent;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
-.engine-search-results {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    margin: 10px;
-}
-
-.autocomplete-list {
+.role-segment ion-segment-button::before {
+    content: '';
     position: absolute;
-    z-index: 1000;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ddd;
-    border-radius: 0 0 8px 8px;
-    margin-top: -5px;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.form-card {
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+.role-segment ion-segment-button.segment-button-checked {
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Search Bar */
+.custom-search {
+    margin-bottom: 1.5rem;
+    --background: var(--color-surface);
+    --box-shadow: var(--shadow-sm);
+    --border-radius: var(--radius-full);
+    --placeholder-color: var(--color-text-tertiary);
+    --icon-color: var(--color-primary);
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.custom-search .searchbar-input-container {
+    height: 50px;
+}
+
+/* Autocomplete List */
+.autocomplete-list {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    z-index: 100;
+    position: relative;
+    border: 1px solid var(--color-border);
+    animation: slideDown 0.2s ease-out;
+}
+
+.autocomplete-list ion-item {
+    --padding-start: 1rem;
+    --inner-padding-end: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.autocomplete-list ion-item:hover {
+    --background: var(--color-background);
+}
+
+/* Patient Card */
+.patient-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: 0;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.patient-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--color-secondary);
 }
 
 .patient-card-header {
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    border-left: 5px solid var(--ion-color-primary);
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.05), rgba(107, 140, 174, 0.05));
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 .avatar-placeholder {
-    width: 60px;
-    height: 60px;
-    background: var(--ion-color-primary);
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.75rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
 }
 
-.triage-modal {
-    --height: 90%;
-    --border-radius: 20px 20px 0 0;
+.patient-info h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
 }
 
-/* Transitions for autocomplete */
-.autocomplete-list {
-    transition: all 0.2s ease-in-out;
+.patient-info p {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-IonItem h2 {
-    color: #333;
+.patient-card ion-card-content {
+    padding: 1.5rem;
 }
 
-IonItem p {
-    color: #666;
-    font-size: 0.9em;
+/* Form Groups inside Card */
+.patient-card .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.patient-card ion-list {
+    padding: 0;
+}
+
+.patient-card ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --background: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.patient-card ion-label {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.patient-card ion-text {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+/* Action Button */
+.triage-btn {
+    margin-top: 1rem;
+    --background: var(--color-secondary);
+    --background-hover: #e6600d;
+    --border-radius: var(--radius-lg);
+    font-weight: 600;
+    height: 48px;
+    --box-shadow: var(--shadow-md);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Animations */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

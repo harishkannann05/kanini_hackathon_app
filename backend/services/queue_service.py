@@ -15,11 +15,17 @@ async def compute_priority_score(db: AsyncSession, visit_id: str, triage_result:
     Compute priority score based on:
     Base Infection Priority + Vital Abnormality (risk_score) + Chronic Risk + Age Risk
     """
+    # Convert visit_id to UUID
+    try:
+        visit_id_uuid = uuid.UUID(visit_id) if isinstance(visit_id, str) else visit_id
+    except (ValueError, TypeError):
+        return 50 if is_emergency else 0
+    
     # 1. Base Score from AI Risk (1-10 scaled to 0-30)
     base_score = triage_result["risk_score"] * 3
     
     # 2. Fetch Patient Data
-    stmt = select(Patient).join(Visit, Visit.patient_id == Patient.patient_id).where(Visit.visit_id == visit_id)
+    stmt = select(Patient).join(Visit, Visit.patient_id == Patient.patient_id).where(Visit.visit_id == visit_id_uuid)
     result = await db.execute(stmt)
     patient = result.scalars().first()
     
@@ -84,6 +90,10 @@ async def compute_priority_score(db: AsyncSession, visit_id: str, triage_result:
 
 async def get_next_position(db: AsyncSession, doctor_id: str) -> int:
     """Get the next queue position for a doctor."""
+    # Coerce doctor_id to UUID if it's a string
+    if isinstance(doctor_id, str):
+        doctor_id = uuid.UUID(doctor_id)
+    
     stmt = select(func.coalesce(func.max(Queue.queue_position), 0) + 1).where(
         Queue.doctor_id == doctor_id
     )
@@ -100,39 +110,47 @@ async def insert_into_queue(
     """
     Insert patient into the queue. Returns queue position.
     """
+    # Coerce IDs to UUID early
+    if isinstance(visit_id, str):
+        visit_id_uuid = uuid.UUID(visit_id)
+    else:
+        visit_id_uuid = visit_id
+        
+    if isinstance(doctor_id, str):
+        doctor_id_uuid = uuid.UUID(doctor_id)
+        doctor_id_str = doctor_id
+    else:
+        doctor_id_uuid = doctor_id
+        doctor_id_str = str(doctor_id)
+    
     is_emergency = triage_result["risk_level"] == "High"
     
     # Compute detailed priority
-    priority = await compute_priority_score(db, visit_id, triage_result, is_emergency)
+    priority = await compute_priority_score(db, str(visit_id_uuid), triage_result, is_emergency)
 
     # Prevent duplicate insertions
     existing = await db.execute(
-        select(Queue.queue_id).where(Queue.visit_id == visit_id)
+        select(Queue.queue_id).where(Queue.visit_id == visit_id_uuid)
     )
     if existing.scalar_one_or_none():
         return 0  # Already in queue
 
-    position = await get_next_position(db, doctor_id)
+    position = await get_next_position(db, doctor_id_str)
 
     # Emergency patients get position 1 (pushed to front)
     if is_emergency:
         # Shift existing positions down
         await db.execute(
             update(Queue)
-            .where(Queue.doctor_id == doctor_id)
+            .where(Queue.doctor_id == doctor_id_uuid)
             .values(queue_position=Queue.queue_position + 1)
         )
         position = 1
 
-    if isinstance(visit_id, str):
-        visit_id = uuid.UUID(visit_id)
-    if isinstance(doctor_id, str):
-        doctor_id = uuid.UUID(doctor_id)
-
     queue_entry = Queue(
         queue_id=uuid.uuid4(),
-        visit_id=visit_id,
-        doctor_id=doctor_id,
+        visit_id=visit_id_uuid,
+        doctor_id=doctor_id_uuid,
         priority_score=priority,
         queue_position=position,
         waiting_time_minutes=0,
@@ -141,7 +159,7 @@ async def insert_into_queue(
     db.add(queue_entry)
     await db.flush()
     # Reorder and notify
-    await reorder_queue_for_doctor(db, doctor_id)
+    await reorder_queue_for_doctor(db, doctor_id_str)
     return position
 
 
@@ -149,6 +167,12 @@ async def estimate_wait_time(db: AsyncSession, visit_id: str, doctor_id: str) ->
     """
     Estimate wait time in minutes based on queue position and avg consultation time.
     """
+    # Coerce IDs to UUID
+    if isinstance(visit_id, str):
+        visit_id = uuid.UUID(visit_id)
+    if isinstance(doctor_id, str):
+        doctor_id = uuid.UUID(doctor_id)
+    
     # Get this patient's position
     stmt = select(Queue.queue_position).where(Queue.visit_id == visit_id)
     result = await db.execute(stmt)
@@ -171,6 +195,10 @@ async def estimate_wait_time(db: AsyncSession, visit_id: str, doctor_id: str) ->
 
 async def get_doctor_queue(db: AsyncSession, doctor_id: str) -> list[dict]:
     """Get the dynamically sorted queue for a doctor."""
+    # Coerce doctor_id to UUID if it's a string
+    if isinstance(doctor_id, str):
+        doctor_id = uuid.UUID(doctor_id)
+    
     stmt = (
         select(
             Queue,
@@ -251,9 +279,11 @@ async def reorder_queue_for_doctor(db: AsyncSession, doctor_id: str) -> list[dic
     """Recompute dynamic queue ordering, persist positions, and broadcast updates."""
     queue_list = await get_doctor_queue(db, doctor_id)
     for item in queue_list:
+        # Convert queue_id from string back to UUID for database query
+        queue_id_uuid = uuid.UUID(item["queue_id"])
         await db.execute(
             update(Queue)
-            .where(Queue.queue_id == item["queue_id"])
+            .where(Queue.queue_id == queue_id_uuid)
             .values(
                 queue_position=item["position"],
                 wait_time_boost=item.get("wait_time_boost", 0),

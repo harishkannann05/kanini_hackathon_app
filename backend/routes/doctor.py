@@ -24,34 +24,41 @@ async def get_doctor_queue_endpoint(doctor_id: str, db: AsyncSession = Depends(g
 async def serve_queue_entry(queue_id: str, req: ServeRequest, db: AsyncSession = Depends(get_db)):
     """Start or complete a consultation."""
     async with db.begin():
-        stmt = select(Queue).where(Queue.queue_id == queue_id)
+        # Convert queue_id to UUID
+        queue_id_uuid = uuid.UUID(queue_id)
+        stmt = select(Queue).where(Queue.queue_id == queue_id_uuid)
         result = await db.execute(stmt)
         entry = result.scalars().first()
         if not entry:
             raise HTTPException(status_code=404, detail="Queue entry not found")
 
         if req.action == "start":
+            visit_id_uuid = entry.visit_id if isinstance(entry.visit_id, uuid.UUID) else uuid.UUID(str(entry.visit_id))
             await db.execute(
-                update(Visit).where(Visit.visit_id == entry.visit_id).values(status="In Consultation")
+                update(Visit).where(Visit.visit_id == visit_id_uuid).values(status="In Consultation")
             )
         elif req.action == "complete":
+            visit_id_uuid = entry.visit_id if isinstance(entry.visit_id, uuid.UUID) else uuid.UUID(str(entry.visit_id))
             await db.execute(
-                update(Visit).where(Visit.visit_id == entry.visit_id).values(
+                update(Visit).where(Visit.visit_id == visit_id_uuid).values(
                     status="Completed",
                     completed_at=datetime.now(timezone.utc)
                 )
             )
             # Deactivate assignment
+            visit_id_uuid = entry.visit_id if isinstance(entry.visit_id, uuid.UUID) else uuid.UUID(str(entry.visit_id))
             await db.execute(
                 update(DoctorAssignment)
-                .where(DoctorAssignment.visit_id == entry.visit_id)
+                .where(DoctorAssignment.visit_id == visit_id_uuid)
                 .values(is_active=False)
             )
             # Remove from queue
-            await db.execute(delete(Queue).where(Queue.queue_id == entry.queue_id))
+            queue_id_uuid = entry.queue_id if isinstance(entry.queue_id, uuid.UUID) else uuid.UUID(str(entry.queue_id))
+            await db.execute(delete(Queue).where(Queue.queue_id == queue_id_uuid))
 
             # Record patient preference for this doctor if possible
-            visit_stmt = select(Visit.patient_id).where(Visit.visit_id == entry.visit_id)
+            visit_id_uuid = entry.visit_id if isinstance(entry.visit_id, uuid.UUID) else uuid.UUID(str(entry.visit_id))
+            visit_stmt = select(Visit.patient_id).where(Visit.visit_id == visit_id_uuid)
             visit_res = await db.execute(visit_stmt)
             patient_id = visit_res.scalar_one_or_none()
             if patient_id and entry.doctor_id:
@@ -94,10 +101,14 @@ async def create_medical_record(
             raise HTTPException(status_code=400, detail="Invalid follow_up_date format")
 
     async with db.begin():
+        # Convert visit_id and doctor_id to UUID
+        visit_id_uuid = uuid.UUID(visit_id)
+        doctor_id_uuid = uuid.UUID(payload.doctor_id)
+        
         record = MedicalRecord(
             record_id=uuid.uuid4(),
-            visit_id=visit_id,
-            doctor_id=payload.doctor_id,
+            visit_id=visit_id_uuid,
+            doctor_id=doctor_id_uuid,
             diagnosis=payload.diagnosis,
             syndrome_identified=payload.syndrome_identified,
             treatment_plan=payload.treatment_plan,

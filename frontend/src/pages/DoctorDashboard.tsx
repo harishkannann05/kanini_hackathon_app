@@ -202,26 +202,56 @@ const DoctorDashboard: React.FC = () => {
 
     return (
         <IonPage className="doctor-page">
-            <IonHeader>
-                <IonToolbar color="primary">
-                    <IonTitle>Dr. Dashboard</IonTitle>
-                    <IonButtons slot="end">
-                        <div className="status-indicator">
-                            <span className={`dot ${wsConnected ? 'online' : 'offline'}`}></span>
-                            {wsConnected ? 'Live' : 'Connecting...'}
-                        </div>
-                        <IonButton onClick={() => {
-                            localStorage.clear();
-                            history.replace('/login');
-                        }}>
-                            Logout
-                        </IonButton>
-                    </IonButtons>
-                </IonToolbar>
-            </IonHeader>
+
 
             <IonContent className="ion-padding doctor-content">
                 <div className="dashboard-header">
+                    <div className="header-greeting">
+                        <h1>Hello, Doctor.</h1>
+                        <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                </div>
+
+                {/* Metrics Grid */}
+                <IonGrid className="metrics-grid">
+                    <IonRow>
+                        <IonCol size="12" sizeMd="4">
+                            <div className="stat-card blue">
+                                <div className="stat-icon">
+                                    <IonIcon icon={personOutline} />
+                                </div>
+                                <div className="stat-content">
+                                    <h3>{queue.length}</h3>
+                                    <p>Patients Waiting</p>
+                                </div>
+                            </div>
+                        </IonCol>
+                        <IonCol size="12" sizeMd="4">
+                            <div className="stat-card orange">
+                                <div className="stat-icon">
+                                    <IonIcon icon={pulseOutline} />
+                                </div>
+                                <div className="stat-content">
+                                    <h3>{queue.filter(p => p.risk_level === 'High' || p.is_emergency).length}</h3>
+                                    <p>Critical Cases</p>
+                                </div>
+                            </div>
+                        </IonCol>
+                        <IonCol size="12" sizeMd="4">
+                            <div className="stat-card teal">
+                                <div className="stat-icon">
+                                    <IonIcon icon={timeOutline} />
+                                </div>
+                                <div className="stat-content">
+                                    <h3>{queue.length > 0 ? Math.round(queue.reduce((acc, curr) => acc + curr.waiting_minutes, 0) / queue.length) : 0}m</h3>
+                                    <p>Avg. Wait Time</p>
+                                </div>
+                            </div>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
+
+                <div className="queue-section-header">
                     <h2>Patient Queue</h2>
                     <p>Sorted by AI Priority & Wait Time</p>
                 </div>

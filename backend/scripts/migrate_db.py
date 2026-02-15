@@ -95,12 +95,31 @@ async def seed_departments_and_doctors():
                 await session.flush()
                 print(f"  -> Created {len(DEPARTMENTS)} departments")
                 
-                # Create doctors
-                for spec, dept_name, exp in DOCTORS:
+                # Create doctor users and doctors
+                from models import User
+                import hashlib
+                
+                for i, (spec, dept_name, exp) in enumerate(DOCTORS, 1):
+                    # Create a user for the doctor
+                    email = f"doctor{i}@hospital.com"
+                    hashed = hashlib.sha256(f"password{i}".encode()).hexdigest()
+                    user = User(
+                        user_id=uuid.uuid4(),
+                        email=email,
+                        password_hash=hashed,
+                        full_name=spec,
+                        role="Doctor",
+                        is_active=True
+                    )
+                    session.add(user)
+                    await session.flush()
+                    
+                    # Create doctor
                     dept = dept_map.get(dept_name)
                     if dept:
                         doctor = Doctor(
                             doctor_id=uuid.uuid4(),
+                            user_id=user.user_id,
                             specialization=spec,
                             department_id=dept.department_id,
                             experience_years=exp,
