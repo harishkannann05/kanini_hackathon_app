@@ -34,19 +34,31 @@ import './App.css';
 
 setupIonicReact();
 
-// Private Route Component
-const PrivateRoute: React.FC<{ component: React.ComponentType<any>; path: string; exact?: boolean }> = ({ component: Component, ...rest }) => {
+// Private Route Component with Role-Based Access
+const PrivateRoute: React.FC<{
+  component: React.ComponentType<any>;
+  path: string;
+  exact?: boolean;
+  allowedRoles?: string[];
+}> = ({ component: Component, allowedRoles, ...rest }) => {
   const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('role');
+
   return (
     <Route
       {...rest}
-      render={props =>
-        token ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
+      render={props => {
+        if (!token) {
+          return <Redirect to="/login" />;
+        }
+
+        if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
+          // Unauthorized role, redirect to appropriate home or landing
+          return <Redirect to="/" />;
+        }
+
+        return <Component {...props} />;
+      }}
     />
   );
 };
@@ -64,12 +76,12 @@ const App: React.FC = () => {
               <Route exact path="/intake" component={PatientIntake} />
               <Route exact path="/doctors" component={Doctors} />
 
-              {/* Protected Routes */}
+              {/* Protected Routes with Role-Based Access */}
               <PrivateRoute exact path="/dashboard" component={Dashboard} />
-              <PrivateRoute exact path="/admin-dashboard" component={AdminDashboard} />
-              <PrivateRoute exact path="/doctor-dashboard" component={DoctorDashboard} />
-              <PrivateRoute exact path="/recipient-dashboard" component={RecipientDashboard} />
-              <PrivateRoute exact path="/patient-dashboard" component={PatientDashboard} />
+              <PrivateRoute exact path="/admin-dashboard" component={AdminDashboard} allowedRoles={['Admin']} />
+              <PrivateRoute exact path="/doctor-dashboard" component={DoctorDashboard} allowedRoles={['Doctor']} />
+              <PrivateRoute exact path="/recipient-dashboard" component={RecipientDashboard} allowedRoles={['Recipient']} />
+              <PrivateRoute exact path="/patient-dashboard" component={PatientDashboard} allowedRoles={['Patient']} />
 
               {/* Fallback */}
               <Redirect from="*" to="/" />

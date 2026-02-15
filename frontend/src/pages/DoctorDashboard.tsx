@@ -205,44 +205,42 @@ const DoctorDashboard: React.FC = () => {
 
 
             <IonContent className="ion-padding doctor-content">
-                <div className="dashboard-header">
+                <div className="dashboard-header animate-enter" style={{ animationDelay: '0s' }}>
                     <div className="header-greeting">
                         <h1>Hello, Doctor.</h1>
                         <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     </div>
+                    <div className={`status-indicator ${wsConnected ? 'online' : 'offline'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'white', padding: '8px 16px', borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontSize: '0.9rem', fontWeight: '600', color: wsConnected ? '#10b981' : '#ef4444' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: wsConnected ? '#10b981' : '#ef4444' }}></div>
+                        {wsConnected ? 'Live Updates' : 'Reconnecting...'}
+                    </div>
                 </div>
 
                 {/* Metrics Grid */}
-                <IonGrid className="metrics-grid">
+                <IonGrid style={{ padding: 0 }}>
                     <IonRow>
-                        <IonCol size="12" sizeMd="4">
-                            <div className="stat-card blue">
-                                <div className="stat-icon">
-                                    <IonIcon icon={personOutline} />
-                                </div>
-                                <div className="stat-content">
+                        <IonCol size="12" sizeMd="4" className="animate-enter" style={{ animationDelay: '0.1s' }}>
+                            <div className="doctor-stat-card blue">
+                                <div className="stat-icon-wrapper"><IonIcon icon={personOutline} /></div>
+                                <div className="stat-info">
                                     <h3>{queue.length}</h3>
                                     <p>Patients Waiting</p>
                                 </div>
                             </div>
                         </IonCol>
-                        <IonCol size="12" sizeMd="4">
-                            <div className="stat-card orange">
-                                <div className="stat-icon">
-                                    <IonIcon icon={pulseOutline} />
-                                </div>
-                                <div className="stat-content">
+                        <IonCol size="12" sizeMd="4" className="animate-enter" style={{ animationDelay: '0.15s' }}>
+                            <div className="doctor-stat-card orange">
+                                <div className="stat-icon-wrapper"><IonIcon icon={pulseOutline} /></div>
+                                <div className="stat-info">
                                     <h3>{queue.filter(p => p.risk_level === 'High' || p.is_emergency).length}</h3>
                                     <p>Critical Cases</p>
                                 </div>
                             </div>
                         </IonCol>
-                        <IonCol size="12" sizeMd="4">
-                            <div className="stat-card teal">
-                                <div className="stat-icon">
-                                    <IonIcon icon={timeOutline} />
-                                </div>
-                                <div className="stat-content">
+                        <IonCol size="12" sizeMd="4" className="animate-enter" style={{ animationDelay: '0.2s' }}>
+                            <div className="doctor-stat-card teal">
+                                <div className="stat-icon-wrapper"><IonIcon icon={timeOutline} /></div>
+                                <div className="stat-info">
                                     <h3>{queue.length > 0 ? Math.round(queue.reduce((acc, curr) => acc + curr.waiting_minutes, 0) / queue.length) : 0}m</h3>
                                     <p>Avg. Wait Time</p>
                                 </div>
@@ -251,111 +249,108 @@ const DoctorDashboard: React.FC = () => {
                     </IonRow>
                 </IonGrid>
 
-                <div className="queue-section-header">
+                <div className="queue-section-header animate-enter" style={{ animationDelay: '0.25s' }}>
                     <h2>Patient Queue</h2>
-                    <p>Sorted by AI Priority & Wait Time</p>
+                    <span className="queue-subtext">Sorted by AI Priority & Wait Time</span>
                 </div>
 
                 {loading ? (
-                    <div className="loading-state">Loading Queue...</div>
+                    <div className="loading-state" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>Loading Queue...</div>
                 ) : queue.length === 0 ? (
-                    <div className="empty-state">
-                        <IonIcon icon={checkmarkDoneOutline} size="large" />
-                        <h3>All Caught Up!</h3>
-                        <p>No patients in queue.</p>
+                    <div className="empty-state animate-enter" style={{ animationDelay: '0.3s', textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.03)' }}>
+                        <IonIcon icon={checkmarkDoneOutline} style={{ fontSize: '4rem', color: '#cbd5e1', marginBottom: '1rem' }} />
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#475569', marginBottom: '0.5rem' }}>All Caught Up!</h3>
+                        <p style={{ color: '#94a3b8' }}>No patients in queue. Enjoy your break! ☕</p>
                     </div>
                 ) : (
-                    <div className="queue-list">
-                        {queue.map((item, index) => (
-                            <IonCard key={item.queue_id} className={`queue-card ${index === 0 ? 'active-card' : ''}`}>
-                                <IonCardContent>
-                                    <div className="queue-row">
-                                        <div className="queue-pos">
-                                            #{item.position}
+                    <div className="queue-container">
+                        {/* Active Patient (Hero) */}
+                        {queue.length > 0 && (() => {
+                            const active = queue[0];
+                            return (
+                                <div className="active-patient-card animate-enter" style={{ animationDelay: '0.3s' }}>
+                                    <div className="active-badge">
+                                        <div className="pulsing-dot"></div> Now Serving
+                                    </div>
+                                    <div className="active-patient-header">
+                                        <div className="patient-avatar-large">
+                                            {active.patient_name.charAt(0)}
                                         </div>
-                                        <div className="queue-info">
-                                            <div className="patient-header">
-                                                <h4>{item.patient_name}</h4>
-                                                <IonBadge color={getRiskColor(item.risk_level)}>{item.risk_level} Risk</IonBadge>
-                                                {item.is_emergency && <IonBadge color="danger">EMERGENCY</IonBadge>}
+                                        <div className="active-patient-info">
+                                            <h3>{active.patient_name}</h3>
+                                            <div className="patient-meta">
+                                                <span><IonIcon icon={personOutline} /> {active.age}y / {active.gender}</span>
+                                                <span className={`queue-risk-badge ${active.risk_level}`} style={{ fontSize: '0.9rem' }}>{active.risk_level} Risk</span>
+                                                <span><IonIcon icon={timeOutline} /> {active.waiting_minutes}m wait</span>
                                             </div>
-                                            <div className="patient-details">
-                                                <span><IonIcon icon={personOutline} /> {item.age} / {item.gender}</span>
-                                                <span>
-                                                    <IonIcon icon={timeOutline} />
-                                                    <IonBadge color={getWaitTimeColor(item.waiting_minutes)} className="wait-badge">
-                                                        {item.waiting_minutes}m wait
-                                                        {item.wait_time_boost && item.wait_time_boost > 0 ? ` (+${item.wait_time_boost} boost)` : ''}
-                                                    </IonBadge>
-                                                </span>
-                                                {item.visit_status && (
-                                                    <IonBadge color={item.visit_status === 'In Consultation' ? 'primary' : 'medium'}>
-                                                        {item.visit_status}
-                                                    </IonBadge>
-                                                )}
-                                                <span>Score: {item.priority_score} (Dyn: {item.dynamic_score})
-                                                </span>
-                                            </div>
-                                            <div className="patient-symptoms">
-                                                Symptoms: {item.symptoms}
-                                            </div>
-                                            {item.patient_id && (
-                                                <IonButton
-                                                    fill="clear"
-                                                    size="small"
-                                                    onClick={() => fetchPatientInsights(item.patient_id!)}
-                                                    disabled={insightsLoading}
-                                                >
-                                                    <IonIcon icon={medkitOutline} slot="start" />
-                                                    {insightsLoading ? 'Loading...' : 'View Medical Insights'}
-                                                </IonButton>
-                                            )}
-                                        </div>
-                                        <div className="queue-actions">
-                                            {/* Logic: 
-                                                If it's the top item, show Start.
-                                                If already started (how do we know? backend queue doesn't say status, Visit does.
-                                                Wait, get_doctor_queue returns Queue items. Queue items are active. 
-                                                If Visit status is "In Consultation", we should show Complete.
-                                                But get_doctor_queue query didn't fetch Visit status.
-                                                I should update get_doctor_queue to fetch Visit.status or simpler:
-                                                Just allow Start -> Complete.
-                                                Or backend rejects Start if already in consultation?
-                                                Let's assume Start -> Complete flow.
-                                                Actually, if I start, the backend updates visit status.
-                                                But the item remains in queue until completed.
-                                                So I need to know if it is "In Consultation".
-                                            */}
-                                            <IonButton
-                                                fill="solid"
-                                                color="success"
-                                                onClick={() => handleAction(item.queue_id, 'start')}
-                                                disabled={item.visit_status !== 'Waiting'}
-                                            >
-                                                <IonIcon icon={playOutline} slot="start" />
-                                                Start
-                                            </IonButton>
-                                            <IonButton
-                                                fill="outline"
-                                                color="secondary"
-                                                onClick={() => handleAction(item.queue_id, 'complete')}
-                                                disabled={item.visit_status !== 'In Consultation'}
-                                            >
-                                                <IonIcon icon={checkmarkDoneOutline} slot="start" />
-                                                Done
-                                            </IonButton>
-                                            <IonButton
-                                                fill="clear"
-                                                color="tertiary"
-                                                onClick={() => openRecordModal(item.visit_id)}
-                                            >
-                                                Add Report
-                                            </IonButton>
                                         </div>
                                     </div>
-                                </IonCardContent>
-                            </IonCard>
-                        ))}
+
+                                    <div className="active-symptoms">
+                                        <span className="symptom-label">Reported Symptoms</span>
+                                        <p className="symptom-text">"{active.symptoms}"</p>
+                                        <div style={{ marginTop: '1rem', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            {active.patient_id && (
+                                                <IonChip onClick={() => fetchPatientInsights(active.patient_id!)} color="primary" mode="ios" outline style={{ margin: 0 }}>
+                                                    <IonIcon icon={medkitOutline} /> Medical Insights
+                                                </IonChip>
+                                            )}
+                                            <IonChip color="secondary" mode="ios" outline style={{ margin: 0 }}>
+                                                Triage Score: {active.priority_score}
+                                            </IonChip>
+                                            {active.is_emergency && <IonBadge color="danger" style={{ padding: '8px 12px', borderRadius: '12px' }}>EMERGENCY</IonBadge>}
+                                        </div>
+                                    </div>
+
+                                    <div className="active-actions">
+                                        <IonButton
+                                            className="action-btn" size="default" color="success"
+                                            onClick={() => handleAction(active.queue_id, 'start')}
+                                            disabled={active.visit_status === 'In Consultation'}
+                                            style={{ flex: 1 }}
+                                        >
+                                            <IonIcon icon={playOutline} slot="start" /> Start Visit
+                                        </IonButton>
+                                        <IonButton
+                                            className="action-btn" size="default" color="tertiary"
+                                            onClick={() => openRecordModal(active.visit_id)}
+                                            style={{ flex: 1 }}
+                                        >
+                                            Add Medical Report
+                                        </IonButton>
+                                        <IonButton
+                                            className="action-btn" size="default" color="medium" fill="outline"
+                                            onClick={() => handleAction(active.queue_id, 'complete')}
+                                            style={{ flex: 1 }}
+                                        >
+                                            <IonIcon icon={checkmarkDoneOutline} slot="start" /> Complete
+                                        </IonButton>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
+                        {/* Upcoming List */}
+                        {queue.length > 1 && (
+                            <div className="upcoming-list animate-enter" style={{ animationDelay: '0.4s' }}>
+                                <h3 style={{ fontSize: '1.1rem', color: '#64748b', margin: '2rem 0 1rem 0', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Up Next ({queue.length - 1})</h3>
+                                {queue.slice(1).map((item, idx) => (
+                                    <div key={item.queue_id} className="queue-card-item">
+                                        <div className="queue-pos-badge">#{item.position}</div>
+                                        <div className="queue-card-info">
+                                            <h4>{item.patient_name}</h4>
+                                            <div className="queue-card-meta">
+                                                <span>{item.age}y / {item.gender}</span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><IonIcon icon={timeOutline} style={{ fontSize: '0.9rem' }} /> {item.waiting_minutes}m</span>
+                                            </div>
+                                        </div>
+                                        <div className="queue-card-status">
+                                            <span className={`queue-risk-badge ${item.risk_level}`}>{item.risk_level}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
             </IonContent>

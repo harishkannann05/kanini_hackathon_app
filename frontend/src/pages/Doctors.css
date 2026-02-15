@@ -1,251 +1,287 @@
 /* ============================================
-   DOCTORS PAGE - MEDICAL THEME
+   DOCTORS PAGE - PREMIUM MEDICAL THEME
    ============================================ */
 
 .doctors-page {
-    --background: var(--color-background);
+    --background: #f8fafc;
 }
-
-/* ============================================
-   CONTENT AREA
-   ============================================ */
 
 .dark-content {
-    --background: var(--color-background);
+    --background: #f8fafc;
 }
 
+/* Container */
 .doctors-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 3rem 2rem;
-    animation: fadeIn 0.5s ease-out;
+    max-width: 100%;
+    margin: 0;
+    padding: 2rem 3rem;
 }
 
-/* ============================================
-   PAGE TITLE
-   ============================================ */
+/* Grid Spacing */
+ion-grid {
+    padding: 0 !important;
+}
+
+ion-row {
+    margin: 0 -12px;
+}
+
+ion-col {
+    padding: 12px !important;
+    margin-bottom: 12px;
+}
+
+/* Header */
+.doctors-header {
+    margin-bottom: 3rem;
+    text-align: center;
+}
 
 .page-title {
-    font-family: var(--font-family-heading);
     font-size: 2.5rem;
     font-weight: 800;
-    color: var(--color-primary);
-    margin-bottom: 3rem;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
     display: flex;
     align-items: center;
+    justify-content: center;
+    /* Centered */
     gap: 1rem;
-    position: relative;
-    padding-bottom: 1rem;
-    border-bottom: 3px solid var(--color-primary);
-    animation: slideUp 0.6s ease-out;
-}
-
-.page-title::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 150px;
-    height: 3px;
-    background: var(--color-beige);
-    animation: slideRight 0.8s ease-out;
-}
-
-@keyframes slideRight {
-    from {
-        width: 0;
-    }
-
-    to {
-        width: 150px;
-    }
+    letter-spacing: -0.03em;
+    border: none;
+    /* Ensure no border */
 }
 
 .page-title ion-icon {
     font-size: 3rem;
-    color: var(--color-primary);
-    animation: bounce 2s ease-in-out infinite;
+    color: #3b82f6;
+    filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.3));
 }
 
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
+.page-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
-/* ============================================
-   DOCTOR LIST
-   ============================================ */
-
-.dark-list {
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+/* Loading/Error */
+.loading-state {
+    text-align: center;
+    padding: 4rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    color: #64748b;
+    font-size: 1.2rem;
 }
 
-.doctor-item {
-    --background: var(--color-surface);
-    --border-color: var(--color-border);
-    --color: var(--color-text-primary);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-md);
+.loading-state.error {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+
+/* CARD STYLES */
+
+.doctor-card-premium {
+    background: white;
+    border-radius: 20px;
+    /* Slightly tighter radius */
+    padding: 1.25rem;
+    /* Reduced padding */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    /* Softer shadow */
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-}
-
-.doctor-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 5px;
     height: 100%;
-    background: linear-gradient(135deg,
-            var(--color-primary) 0%,
-            var(--color-secondary) 100%);
-    transform: scaleY(0);
-    transform-origin: top;
-    transition: transform 0.4s ease;
+    display: flex;
+    flex-direction: column;
 }
 
-.doctor-item:hover::before {
-    transform: scaleY(1);
+.doctor-card-premium:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
 }
 
-.doctor-item:hover {
-    transform: translateX(10px) scale(1.02);
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-xl);
+.doc-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    /* Reduced margin */
+    position: relative;
 }
 
-.doctor-item::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle,
-            rgba(30, 58, 95, 0.05) 0%,
-            transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.doctor-item:hover::after {
-    opacity: 1;
-}
-
-/* ============================================
-   DOCTOR AVATAR
-   ============================================ */
-
-.doctor-avatar-box {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg,
-            var(--color-primary) 0%,
-            var(--color-secondary) 100%);
-    color: var(--color-text-on-primary);
+.doc-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.doc-info h3 {
+    margin: 0;
     font-size: 1.25rem;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
-    transition: all 0.3s ease;
-}
-
-.doctor-item:hover .doctor-avatar-box {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 6px 18px rgba(30, 58, 95, 0.4);
-}
-
-/* ============================================
-   DOCTOR LABEL
-   ============================================ */
-
-.doctor-label h2 {
-    font-family: var(--font-family-heading);
-    font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 0.5rem;
-    transition: color 0.3s ease;
+    color: #1e293b;
+    line-height: 1.2;
 }
 
-.doctor-item:hover .doctor-label h2 {
-    color: var(--color-primary);
-}
-
-.doctor-label p {
-    font-size: 1rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-.exp-badge {
-    display: inline-block;
-    background: linear-gradient(135deg,
-            rgba(107, 140, 174, 0.1) 0%,
-            rgba(168, 197, 209, 0.1) 100%);
-    color: var(--color-secondary);
-    padding: 0.375rem 0.875rem;
-    border-radius: var(--radius-full);
+.doc-dept {
+    font-size: 0.9rem;
+    color: #3b82f6;
     font-weight: 600;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-    border: 1px solid var(--color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+    display: block;
 }
 
-/* ============================================
-   STATUS BADGES
-   ============================================ */
+.doc-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 2px solid white;
+}
 
-.status-badge {
+.doc-status-dot.available {
+    background: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.doc-status-dot.busy {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.doc-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* Tighter gap */
+    margin-bottom: 1.25rem;
+}
+
+.doc-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 0.75rem;
+    /* Reduced padding */
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.doc-meta-row ion-icon {
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.doc-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.status-text {
+    font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.625rem 1.25rem;
-    border-radius: var(--radius-full);
-    font-size: 0.875rem;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
 }
 
-.status-badge:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-md);
+.status-text.available {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #d1fae5;
 }
 
-ion-badge[color="success"] {
-    --background: var(--color-success);
-    --color: #ffffff;
+.status-text.busy {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fde68a;
 }
 
-ion-badge[color="warning"] {
-    --background: var(--color-warning);
-    --color: #ffffff;
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #2563eb;
+    font-weight: 700;
+    background: #eff6ff;
+    padding: 4px 10px;
+    border-radius: 50px;
 }
 
-ion-badge[color="primary"] {
-    --background: var(--color-primary);
-    --color: #ffffff;
-    animation: pulse 1.5s ease-in-out infinite;
+.pulsing-dot-small {
+    width: 6px;
+    height: 6px;
+    background: #2563eb;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
 }
 
-/* ============================================
-   BACK BUTTON
-   ============================================ */
+/* Animations */
+.animate-enter {
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.animate-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    }
+}
 
 .back-container {
     margin-top: 3rem;
@@ -253,150 +289,31 @@ ion-badge[color="primary"] {
 }
 
 .back-btn {
-    --color: var(--color-primary);
-    --background-hover: rgba(30, 58, 95, 0.05);
+    --color: #64748b;
+    --background-hover: #f1f5f9;
     font-weight: 600;
-    font-size: 1.125rem;
-    text-transform: none;
-    transition: all 0.3s ease;
-    padding: 1rem 2rem;
-}
-
-.back-btn:hover {
-    transform: translateY(-2px);
-    --color: var(--color-secondary);
 }
 
 /* ============================================
-   STAGGERED ANIMATIONS
-   ============================================ */
-
-.doctor-item {
-    animation: slideUp 0.5s ease-out backwards;
-}
-
-.doctor-item:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.doctor-item:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.doctor-item:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.doctor-item:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-.doctor-item:nth-child(5) {
-    animation-delay: 0.5s;
-}
-
-.doctor-item:nth-child(n+6) {
-    animation-delay: 0.6s;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.8;
-        transform: scale(0.95);
-    }
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
+   RESPONSIVE
    ============================================ */
 
 @media (max-width: 768px) {
     .doctors-container {
-        padding: 2rem 1rem;
-    }
-
-    .custom-title {
-        font-size: 1.25rem;
+        padding: 1rem;
     }
 
     .page-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
         flex-direction: column;
-        align-items: flex-start;
+        gap: 0.5rem;
     }
 
     .page-title ion-icon {
         font-size: 2.5rem;
     }
 
-    .doctor-label h2 {
-        font-size: 1.25rem;
-    }
-
-    .doctor-item:hover {
-        transform: translateX(5px) scale(1.01);
-    }
-}
-
-@media (max-width: 480px) {
-    .page-title {
-        font-size: 1.75rem;
-    }
-
-    .doctor-label h2 {
-        font-size: 1.125rem;
-    }
-
-    .doctor-label p {
-        font-size: 0.875rem;
-    }
-
-    .exp-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.625rem;
-    }
-}
-
-/* ============================================
-   ACCESSIBILITY
-   ============================================ */
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+    .doctor-card-premium {
+        padding: 1rem;
     }
 }

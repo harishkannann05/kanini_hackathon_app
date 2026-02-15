@@ -52,6 +52,8 @@ class Doctor(Base):
     consultation_fee: Mapped[float] = mapped_column(Numeric(10, 2), nullable=True)
     is_available: Mapped[bool] = mapped_column(Boolean, default=True)
     max_daily_patients: Mapped[int] = mapped_column(Integer, default=50)
+    shift_start: Mapped[str] = mapped_column(String(5), default="09:00")  # HH:MM format
+    shift_end: Mapped[str] = mapped_column(String(5), default="17:00")    # HH:MM format
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
 

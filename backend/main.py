@@ -69,7 +69,7 @@ app = FastAPI(title="AI Smart Patient Triage", version="2.0.0", lifespan=lifespa
 # CORS Configuration - Allow frontend to make requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"],  # Frontend URLs
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:5175", "http://127.0.0.1:5175"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Allow all headers
@@ -111,10 +111,9 @@ async def create_visit(payload: VisitRequest, db: AsyncSession = Depends(get_db)
             # Audit Log
             audit = AuditLog(
                 log_id=uuid.uuid4(),
-                action="visit_created",
+                action=f"visit_created - Risk: {result['risk_level']}, Dept: {result['department']}",
                 target_table="visits",
-                target_id=uuid.UUID(result["visit_id"]),
-                details=f"Risk: {result['risk_level']}, Dept: {result['department']}"
+                target_id=uuid.UUID(result["visit_id"])
             )
             db.add(audit)
             return result
@@ -204,15 +203,19 @@ async def override_risk(visit_id: str, req: OverrideRequest, db: AsyncSession = 
 # ══════════════════════════════════════════════════════════════
 @app.get("/doctors")
 async def list_doctors(db: AsyncSession = Depends(get_db)):
+    from models import User  # Ensure User is available
     async with db.begin():
         result = await db.execute(
-            select(Doctor, Department.name.label("dept_name"))
+            select(Doctor, Department.name.label("dept_name"), User.full_name, User.email)
+            .join(User, Doctor.user_id == User.user_id)
             .outerjoin(Department, Doctor.department_id == Department.department_id)
         )
         rows = result.all()
         return [
             {
                 "doctor_id": str(row.Doctor.doctor_id),
+                "full_name": row.full_name, # Doctor's real name
+                "email": row.email,
                 "specialization": row.Doctor.specialization,
                 "department_id": str(row.Doctor.department_id) if row.Doctor.department_id else None,
                 "department_name": row.dept_name,
@@ -275,7 +278,7 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
 
         # Recent visits
         recent_stmt = (
-            select(Visit.visit_id, Visit.status, Visit.arrival_time, Patient.age, Patient.gender)
+            select(Visit.visit_id, Visit.status, Visit.arrival_time, Patient.age, Patient.gender, Patient.full_name)
             .join(Patient, Visit.patient_id == Patient.patient_id)
             .order_by(Visit.arrival_time.desc())
             .limit(10)
@@ -288,6 +291,7 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
                 "arrival_time": r.arrival_time.isoformat() if r.arrival_time else None,
                 "age": r.age,
                 "gender": r.gender,
+                "patient_name": r.full_name,
             }
             for r in recent_result
         ]
@@ -399,3 +403,4 @@ app.include_router(queue_mgmt.router)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+

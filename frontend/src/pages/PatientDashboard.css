@@ -1,237 +1,406 @@
-/* Patient Dashboard Premium Styles */
+/* ============================================
+   PATIENT DASHBOARD - PREMIUM MEDICAL THEME
+   ============================================ */
 
-.patient-page {
-    --background: var(--color-background);
+.patient-dashboard-page {
+    --background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .patient-content {
-    max-width: 900px;
+    --background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* ============================================
+   CONTAINER
+   ============================================ */
+
+.patient-container {
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 1rem;
-    animation: fadeIn 0.4s ease-out;
+    padding: 2.5rem 2rem;
+    animation: fadeIn 0.6s ease-out;
 }
 
-/* Page Title */
-.page-title {
-    margin-bottom: 2rem;
-    padding-left: 0.5rem;
-    color: var(--color-primary);
-}
-
-/* Profile Card */
-.profile-card {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-    border-radius: var(--radius-xl);
-    padding: 2rem;
-    color: white;
-    box-shadow: 0 10px 30px rgba(30, 58, 95, 0.2);
-    margin-bottom: 2.5rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.profile-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(30, 58, 95, 0.3);
-}
-
-.profile-card::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    z-index: 0;
-}
-
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    position: relative;
-    z-index: 1;
-}
-
-.avatar-circle {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: white;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.profile-text h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    color: white;
-}
-
-.profile-text p {
-    font-size: 1rem;
-    margin: 0.5rem 0 0;
-    color: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.profile-text ion-icon {
-    font-size: 1.25rem;
-}
-
-/* Stats Section */
-.stats-grid {
-    margin-bottom: 2.5rem;
-}
-
-.stat-card {
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    text-align: center;
-    color: white;
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
-    border: none;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: var(--shadow-xl);
-}
-
-.stat-card.blue {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-.stat-card.purple {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-}
-
-.stat-metric {
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    opacity: 0.9;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Visit History */
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0 0 1.5rem;
-    padding-left: 0.5rem;
-    border-left: 4px solid var(--color-secondary);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.visit-card {
-    background: var(--color-surface);
-    border-radius: var(--radius-lg);
-    margin-bottom: 1.5rem;
-    padding: 0;
-    /* Let content handle padding */
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border);
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-.visit-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary-light);
-}
-
-.visit-header-row {
-    background: var(--color-background);
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--color-border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.visit-date {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--color-text-primary);
-}
-
-.visit-status {
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-full);
-    font-size: 0.85rem;
-}
-
-.visit-card ion-card-content {
-    padding: 1.5rem;
-}
-
-.visit-detail-row {
-    display: flex;
-    gap: 2rem;
-    font-size: 0.95rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 0.75rem;
-}
-
-.visit-detail-row span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.visit-detail-row ion-icon {
-    color: var(--color-secondary);
-}
-
-/* Empty State */
-.empty-history {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--color-surface);
-    border-radius: var(--radius-lg);
-    color: var(--color-text-tertiary);
-    border: 2px dashed var(--color-border);
-}
-
-/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* ============================================
+   WELCOME SECTION
+   ============================================ */
+
+.patient-welcome {
+    background: linear-gradient(135deg, var(--color-navy-dark) 0%, var(--color-primary-light) 100%);
+    padding: 3rem 2.5rem;
+    border-radius: 24px;
+    margin-bottom: 3rem;
+    box-shadow: 0 20px 40px rgba(0, 70, 135, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.patient-welcome::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.patient-welcome h1 {
+    font-family: var(--font-family-heading);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.patient-welcome p {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   STATUS CARDS
+   ============================================ */
+
+.status-card {
+    --background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 70, 135, 0.08);
+    margin-bottom: 2rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+}
+
+.status-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-navy-dark), var(--color-teal-light));
+}
+
+.status-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 70, 135, 0.15);
+}
+
+.status-card ion-card-header {
+    padding: 2rem 2rem 1rem 2rem;
+}
+
+.status-card ion-card-title {
+    font-family: var(--font-family-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-navy-dark);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-card ion-card-title ion-icon {
+    font-size: 2rem;
+    color: var(--color-orange-accent);
+}
+
+.status-card ion-card-content {
+    padding: 0 2rem 2rem 2rem;
+}
+
+/* ============================================
+   INFO ITEMS
+   ============================================ */
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateX(8px);
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+}
+
+.info-item strong {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item span {
+    font-weight: 700;
+    color: var(--color-navy-dark);
+    font-size: 1.125rem;
+}
+
+/* ============================================
+   PRIORITY BADGES
+   ============================================ */
+
+.priority-badge {
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.priority-badge.low {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #059669;
+}
+
+.priority-badge.medium {
+    background: linear-gradient(135deg, #fed7aa, #fdba74);
+    color: #c2410c;
+}
+
+.priority-badge.high {
+    background: linear-gradient(135deg, #fecaca, #fca5a5);
+    color: #991b1b;
+}
+
+.priority-badge.critical {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    animation: criticalPulse 2s ease-in-out infinite;
+}
+
+@keyframes criticalPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    }
+}
+
+/* ============================================
+   APPOINTMENT CARDS
+   ============================================ */
+
+.appointment-card {
+    --background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 70, 135, 0.08);
+    margin-bottom: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border-left: 6px solid var(--color-teal-light);
+}
+
+.appointment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 70, 135, 0.15);
+}
+
+.appointment-card ion-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+}
+
+.appointment-card ion-card-title {
+    font-family: var(--font-family-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-navy-dark);
+}
+
+.appointment-card ion-card-subtitle {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.5rem;
+}
+
+.appointment-card ion-card-content {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.action-button {
+    --background: linear-gradient(135deg, var(--color-navy-dark), var(--color-primary-light));
+    --color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgba(0, 70, 135, 0.2);
+    transition: all 0.3s ease;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 70, 135, 0.3);
+}
+
+.action-button.secondary {
+    --background: white;
+    --color: var(--color-navy-dark);
+    border: 2px solid var(--color-navy-dark);
+}
+
+.action-button ion-icon {
+    margin-left: 0.5rem;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 70, 135, 0.08);
+}
+
+.empty-state ion-icon {
+    font-size: 5rem;
+    color: var(--color-text-tertiary);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+    font-family: var(--font-family-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+
+.section-title {
+    font-family: var(--font-family-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-navy-dark);
+    margin: 3rem 0 2rem 0;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-orange-accent), var(--color-teal-light));
+    border-radius: 2px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 992px) {
+    .patient-container {
+        padding: 2rem 1.5rem;
+    }
+
+    .patient-welcome {
+        padding: 2rem 1.5rem;
+    }
+
+    .patient-welcome h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .patient-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .patient-welcome {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .patient-welcome h1 {
+        font-size: 1.75rem;
+    }
+
+    .patient-welcome p {
+        font-size: 1rem;
+    }
+
+    .status-card ion-card-header,
+    .status-card ion-card-content {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .patient-welcome h1 {
+        font-size: 1.5rem;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .action-button {
+        width: 100%;
+        justify-content: center;
     }
 }

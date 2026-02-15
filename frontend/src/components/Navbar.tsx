@@ -35,14 +35,35 @@ const Navbar: React.FC = () => {
         setMobileMenuOpen(false);
     }, [location]);
 
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    const getDashboardPath = () => {
+        if (!role) return '/dashboard';
+        switch (role) {
+            case 'Admin': return '/admin-dashboard';
+            case 'Doctor': return '/doctor-dashboard';
+            case 'Recipient': return '/recipient-dashboard';
+            case 'Patient': return '/patient-dashboard';
+            default: return '/dashboard';
+        }
+    };
+
     const navItems = [
-        { path: '/', label: 'Home', icon: homeOutline },
-        { path: '/intake', label: 'Patient Intake', icon: clipboardOutline },
-        { path: '/dashboard', label: 'Dashboard', icon: statsChartOutline },
-        { path: '/doctors', label: 'Doctors', icon: peopleOutline },
-        { path: '/login', label: 'Login', icon: logInOutline },
-        { path: 'logout', label: 'Logout', icon: logOutOutline },
+        { path: '/', label: 'Home', icon: homeOutline, show: 'always' },
+        { path: '/intake', label: 'Patient Intake', icon: clipboardOutline, show: 'always' },
+        { path: '/doctors', label: 'Doctors', icon: peopleOutline, show: 'always' },
+        { path: getDashboardPath(), label: 'Dashboard', icon: statsChartOutline, show: 'authed' },
+        { path: '/login', label: 'Login', icon: logInOutline, show: 'unauthed' },
+        { path: 'logout', label: 'Logout', icon: logOutOutline, show: 'authed' },
     ];
+
+    const filteredItems = navItems.filter(item => {
+        if (item.show === 'always') return true;
+        if (item.show === 'authed') return !!token;
+        if (item.show === 'unauthed') return !token;
+        return true;
+    });
 
     const isActive = (path: string) => {
         return location.pathname === path;
@@ -72,7 +93,7 @@ const Navbar: React.FC = () => {
 
                     {/* Desktop Navigation */}
                     <div className="navbar-menu desktop-menu">
-                        {navItems.map((item) => (
+                        {filteredItems.map((item) => (
                             <button
                                 key={item.path}
                                 className={`nav-item ${isActive(item.path) ? 'nav-item-active' : ''}`}
@@ -97,7 +118,7 @@ const Navbar: React.FC = () => {
                 {/* Mobile Navigation */}
                 <div className={`mobile-menu ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
                     <div className="mobile-menu-content">
-                        {navItems.map((item) => (
+                        {filteredItems.map((item) => (
                             <button
                                 key={item.path}
                                 className={`mobile-nav-item ${isActive(item.path) ? 'mobile-nav-item-active' : ''}`}

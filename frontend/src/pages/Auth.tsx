@@ -34,6 +34,19 @@ const Auth: React.FC = () => {
     const [departments, setDepartments] = useState<any[]>([]);
 
     useEffect(() => {
+        // If already logged in, redirect to dashboard
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        if (token && role) {
+            switch (role) {
+                case 'Admin': history.push('/admin-dashboard'); break;
+                case 'Doctor': history.push('/doctor-dashboard'); break;
+                case 'Recipient': history.push('/recipient-dashboard'); break;
+                case 'Patient': history.push('/patient-dashboard'); break;
+                default: history.push('/dashboard');
+            }
+        }
+
         // Load departments for doctor signup
         const fetchDepts = async () => {
             try {
@@ -44,7 +57,7 @@ const Auth: React.FC = () => {
             }
         };
         fetchDepts();
-    }, []);
+    }, [history]);
 
     const handleAuth = async () => {
         if (!email || !password) {

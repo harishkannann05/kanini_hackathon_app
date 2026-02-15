@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonPage, IonList, IonItem, IonLabel, IonBadge, IonAvatar, IonButton, IonIcon } from '@ionic/react';
-import { peopleOutline } from 'ionicons/icons';
+import { IonContent, IonPage, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonBadge } from '@ionic/react';
+import { peopleOutline, mailOutline, starOutline } from 'ionicons/icons';
 import api from '../api';
 
 import { useHistory } from 'react-router-dom';
@@ -61,10 +61,13 @@ const Doctors: React.FC = () => {
         <IonPage className="doctors-page">
             <IonContent className="dark-content">
                 <div className="doctors-container">
-                    <h1 className="page-title">
-                        <IonIcon icon={peopleOutline} style={{ color: '#4c9aff' }} />
-                        Medical Staff On-Duty
-                    </h1>
+                    <div className="doctors-header animate-enter">
+                        <h1 className="page-title">
+                            <IonIcon icon={peopleOutline} />
+                            Medical Staff On-Duty
+                        </h1>
+                        <p className="page-subtitle">Real-time availability and status</p>
+                    </div>
 
                     {loading ? (
                         <div className="loading-state">Loading doctors...</div>
@@ -73,34 +76,48 @@ const Doctors: React.FC = () => {
                     ) : doctors.length === 0 ? (
                         <div className="loading-state">No doctors available.</div>
                     ) : (
-                        <IonList className="dark-list">
-                            {doctors.map(doc => (
-                                <IonItem key={doc.doctor_id} className="doctor-item" lines="none">
-                                    <IonAvatar slot="start">
-                                        <div className="doctor-avatar-box">
-                                            Dr
+                        <IonGrid style={{ padding: 0 }}>
+                            <IonRow>
+                                {doctors.map((doc, idx) => (
+                                    <IonCol size="12" sizeMd="6" sizeLg="4" key={doc.doctor_id} className="animate-card" style={{ animationDelay: `${idx * 0.1}s` }}>
+                                        <div className="doctor-card-premium">
+                                            <div className="doc-card-header">
+                                                <div className="doc-avatar">
+                                                    {doc.full_name ? doc.full_name.replace(/^(Dr\.|Dr)\s*/i, '').charAt(0) : 'D'}
+                                                </div>
+                                                <div className="doc-info">
+                                                    <h3>{doc.full_name}</h3>
+                                                    <span className="doc-dept">{doc.department_name}</span>
+                                                </div>
+                                                <div className={`doc-status-dot ${doc.is_available ? 'available' : 'busy'}`}></div>
+                                            </div>
+
+                                            <div className="doc-card-body">
+                                                <div className="doc-meta-row">
+                                                    <IonIcon icon={mailOutline} />
+                                                    <span>{doc.email}</span>
+                                                </div>
+                                                <div className="doc-meta-row">
+                                                    <IonIcon icon={starOutline} />
+                                                    <span>{doc.experience_years} Years Experience</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="doc-card-footer">
+                                                <span className={`status-text ${doc.is_available ? 'available' : 'busy'}`}>
+                                                    {doc.is_available ? 'Available Now' : 'Currently Busy'}
+                                                </span>
+                                                {doc._live_activity && (
+                                                    <div className="live-indicator">
+                                                        <div className="pulsing-dot-small"></div> Active
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </IonAvatar>
-                                    <IonLabel className="doctor-label">
-                                        <h2>Dr. {doc.specialization}</h2>
-                                        <p>{doc.department_name}</p>
-                                        <p className="exp-badge">{doc.experience_years} Years Experience</p>
-                                    </IonLabel>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        {doc._live_activity && (
-                                            <IonBadge color="primary">Live</IonBadge>
-                                        )}
-                                        <IonBadge
-                                            slot="end"
-                                            className="status-badge"
-                                            color={doc.is_available ? 'success' : 'warning'}
-                                        >
-                                            {doc.is_available ? 'Available' : 'Busy'}
-                                        </IonBadge>
-                                    </div>
-                                </IonItem>
-                            ))}
-                        </IonList>
+                                    </IonCol>
+                                ))}
+                            </IonRow>
+                        </IonGrid>
                     )}
 
                     <div className="back-container">

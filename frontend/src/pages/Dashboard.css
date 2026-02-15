@@ -1,257 +1,480 @@
-/* Main Dashboard Styling - Apollo Theme */
+/* ============================================
+   DASHBOARD - PREMIUM MEDICAL THEME
+   ============================================ */
 
 .dashboard-page {
-    --background: var(--color-background);
+    --background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
+
+.dashboard-content {
+    --background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* ============================================
+   CONTAINER
+   ============================================ */
 
 .dashboard-container {
-    padding: 2rem 1.5rem;
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
+    padding: 2.5rem 2rem;
+    animation: fadeIn 0.6s ease-out;
 }
 
-/* Welcome Banner */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   WELCOME BANNER
+   ============================================ */
+
 .welcome-banner {
+    background: linear-gradient(135deg, var(--color-navy-dark) 0%, var(--color-primary-light) 100%);
+    padding: 3rem 2.5rem;
+    border-radius: 24px;
+    margin-bottom: 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    background: #ffffff;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(0, 70, 135, 0.05);
-    border-left: 5px solid var(--color-secondary);
-}
-
-.welcome-text h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0 0 0.5rem 0;
-}
-
-.welcome-text p {
-    color: #636e72;
-    margin: 0;
-}
-
-.date-badge {
-    background: var(--color-background);
-    color: var(--color-primary);
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-}
-
-/* Metric Cards */
-.metric-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    border: 1px solid #f1f2f6;
+    box-shadow: 0 20px 40px rgba(0, 70, 135, 0.2);
     position: relative;
     overflow: hidden;
 }
 
-.metric-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 70, 135, 0.1);
+.welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
 }
 
-.icon-wrapper {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-}
-
-.metric-card.blue .icon-wrapper {
-    background: rgba(0, 70, 135, 0.1);
-    color: var(--color-primary);
-}
-
-.metric-card.orange .icon-wrapper {
-    background: rgba(243, 112, 33, 0.1);
-    color: var(--color-secondary);
-}
-
-.metric-card.red .icon-wrapper {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-
-.metric-card.teal .icon-wrapper {
-    background: rgba(0, 206, 201, 0.1);
-    color: var(--color-accent);
-}
-
-.metric-content {
-    flex: 1;
-    margin-left: 1rem;
-}
-
-.metric-content h3 {
-    font-size: 1.75rem;
+.welcome-text h1 {
+    font-family: var(--font-family-heading);
+    font-size: 3rem;
     font-weight: 800;
-    color: var(--color-primary);
-    margin: 0;
+    color: white;
+    margin-bottom: 0.5rem;
     line-height: 1.2;
 }
 
-.metric-content p {
-    color: #636e72;
+.welcome-text p {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
     margin: 0;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
 }
 
-.trend {
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+.date-badge {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 600;
+    font-size: 1.125rem;
 }
 
-.trend.up {
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.1);
+.date-badge ion-icon {
+    font-size: 1.5rem;
 }
 
-.trend.down {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
+/* ============================================
+   METRICS GRID
+   ============================================ */
+
+.metrics-grid {
+    margin-bottom: 3rem;
+    padding: 0;
 }
 
-/* Content Cards */
-.content-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.metric-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 70, 135, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     height: 100%;
 }
 
-.card-header {
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: all 0.3s ease;
+}
+
+.metric-card.blue::before {
+    background: linear-gradient(90deg, var(--color-navy-dark), var(--color-teal-light));
+}
+
+.metric-card.orange::before {
+    background: linear-gradient(90deg, var(--color-orange-accent), #ff9f43);
+}
+
+.metric-card.red::before {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.metric-card.green::before {
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 70, 135, 0.15);
+}
+
+.metric-card .icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.metric-card.blue .icon-wrapper {
+    background: linear-gradient(135deg, rgba(0, 70, 135, 0.1), rgba(0, 206, 201, 0.1));
+    color: var(--color-navy-dark);
+}
+
+.metric-card.orange .icon-wrapper {
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.1), rgba(255, 159, 67, 0.1));
+    color: var(--color-orange-accent);
+}
+
+.metric-card.red .icon-wrapper {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+    color: #ef4444;
+}
+
+.metric-card.green .icon-wrapper {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    color: #10b981;
+}
+
+.metric-card:hover .icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.metric-content h3 {
+    font-family: var(--font-family-heading);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-navy-dark);
+    margin: 0;
+    line-height: 1;
+}
+
+.metric-content p {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+}
+
+.trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    width: fit-content;
+    margin-top: auto;
+}
+
+.trend.up {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #059669;
+}
+
+.trend.down {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+}
+
+.trend ion-icon {
+    font-size: 1rem;
+}
+
+/* ============================================
+   DEPARTMENT CARDS
+   ============================================ */
+
+.department-card {
+    --background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 70, 135, 0.08);
+    margin-bottom: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.department-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 70, 135, 0.15);
+}
+
+.department-card ion-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+}
+
+.department-card ion-card-title {
+    font-family: var(--font-family-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-navy-dark);
+}
+
+.department-card ion-card-subtitle {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.5rem;
+}
+
+.department-card ion-card-content {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.capacity-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #f1f2f6;
-    padding-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
-.card-header h3 {
+.capacity-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.capacity-value {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--color-primary);
-    margin: 0;
+    color: var(--color-navy-dark);
 }
 
-/* Dept List */
-.dept-item {
-    margin-bottom: 1.5rem;
+ion-progress-bar {
+    height: 10px;
+    border-radius: 10px;
+    --background: #e9ecef;
 }
 
-.dept-info {
-    display: flex;
-    justify-content: space-between;
-    font-weight: 600;
-    color: var(--color-primary);
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+ion-progress-bar.low {
+    --progress-background: linear-gradient(90deg, #10b981, #059669);
 }
 
-.dept-stats {
-    color: #636e72;
+ion-progress-bar.medium {
+    --progress-background: linear-gradient(90deg, #f59e0b, #d97706);
 }
 
-.dept-progress {
-    height: 8px;
-    border-radius: 4px;
-    --background: #f1f2f6;
+ion-progress-bar.high {
+    --progress-background: linear-gradient(90deg, #ef4444, #dc2626);
 }
 
-/* Activity Feed */
-.activity-feed {
-    position: relative;
-    padding-left: 1rem;
-    border-left: 2px solid #f1f2f6;
-    margin-left: 0.5rem;
-}
+/* ============================================
+   ACTIVITY FEED
+   ============================================ */
 
 .activity-item {
-    position: relative;
-    padding-left: 1.5rem;
-    margin-bottom: 2rem;
+    --background: white;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 70, 135, 0.06);
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
 }
 
-.activity-item::before {
-    content: '';
-    position: absolute;
-    left: -9px;
-    top: 0;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #ccc;
-    z-index: 1;
+.activity-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 8px 20px rgba(0, 70, 135, 0.12);
 }
 
-.activity-item.success::before {
-    border-color: #10b981;
+.activity-item.success {
+    border-left-color: #10b981;
 }
 
-.activity-item.critical::before {
-    border-color: #ef4444;
+.activity-item.critical {
+    border-left-color: #ef4444;
 }
 
-.activity-item.info::before {
-    border-color: var(--color-primary);
-}
-
-.activity-content p {
-    margin: 0 0 0.25rem 0;
-    font-weight: 500;
-    color: var(--color-primary);
-    font-size: 0.95rem;
+.activity-item.info {
+    border-left-color: var(--color-teal-light);
 }
 
 .activity-time {
-    font-size: 0.8rem;
-    color: #b2bec3;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
 }
 
-.card-footer {
-    text-align: right;
-    margin-top: 1rem;
-    border-top: 1px solid #f1f2f6;
-    padding-top: 0.5rem;
+.activity-message {
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    line-height: 1.5;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.action-btn {
+    --background: linear-gradient(135deg, var(--color-navy-dark), var(--color-primary-light));
+    --color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgba(0, 70, 135, 0.2);
+    transition: all 0.3s ease;
+    text-transform: none;
+    letter-spacing: 0.5px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 70, 135, 0.3);
+}
+
+.action-btn ion-icon {
+    margin-left: 0.5rem;
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+
+.section-header {
+    margin: 3rem 0 2rem 0;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-header h2 {
+    font-family: var(--font-family-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-navy-dark);
+    margin: 0;
+}
+
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-orange-accent), var(--color-teal-light));
+    border-radius: 2px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 992px) {
+    .dashboard-container {
+        padding: 2rem 1.5rem;
+    }
+
     .welcome-banner {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
+        gap: 1.5rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .welcome-text h1 {
+        font-size: 2.25rem;
+    }
+
+    .metric-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .welcome-banner {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-text h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-text p {
+        font-size: 1rem;
+    }
+
+    .date-badge {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+    }
+
+    .metric-content h3 {
+        font-size: 2rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-text h1 {
+        font-size: 1.75rem;
+    }
+
+    .metric-card .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        font-size: 1.75rem;
+    }
+
+    .metric-content h3 {
+        font-size: 1.75rem;
+    }
+
+    .action-btn {
+        width: 100%;
+        justify-content: center;
     }
 }
