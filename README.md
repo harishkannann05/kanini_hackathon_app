@@ -1,128 +1,113 @@
-# 🏥 Smart Triage System
+# 🏥 Medicy: AI-Powered Smart Triage & Hospital Management
+### *Prioritizing lives with Intelligence*
 
-> **AI-Powered Emergency Triage & Smart Routing**
+Medicy is a high-performance **Healthcare Management System** that uses a hybrid **Machine Learning Pipeline** to automate patient triage. By analyzing vitals and symptoms in real-time, Medicy assigns medical priority scores and explains AI decisions using **Explainable AI (SHAP)**.
 
-Smart Triage is an intelligent hospital management system that uses **Machine Learning** to prioritize patients based on their symptoms and vitals. It reduces emergency room wait times by automatically routing patients to the right department and predicting the severity of their condition.
+---
 
-## 🚀 Features
+## 📺 Project Overview
+*   **Mission:** Reduce Emergency Room wait times by intelligently routing patients to the right department.
+*   **Target Audience:** Triage Officers, Doctors, and Hospital Administrators.
+*   **Key Innovation:** A dual-stage ML model (XGBoost + Logistic Regression) paired with a real-time WebSocket dashboard.
 
-- **AI Risk Assessment**: Predicts patient risk levels (Low, Medium, High, Critical) using a trained ML model.
-- **Smart Routing**: Automatically assigns patients to the correct medical department (Cardiology, Neurology, etc.).
-- **Dynamic Prioritization**: Adjusts patient priority based on real-time vitals and symptoms.
-- **SHAP Explainability**: Provides transparent reasoning for AI decisions.
-- **Real-time Dashboard**: Live tracking of patient flow and waiting times.
+---
+
+## 🚀 Key Features
+
+### 🧠 Intelligent Triage
+*   **Automated Risk Scoring:** Real-time calculation of Low, Medium, or High risk levels.
+*   **Smart Routing:** Instantly assigns patients to Cardiology, Neurology, Pulmonology, etc.
+*   **Explainable AI (XAI):** Uses **SHAP TreeExplainer** to show clinicians exactly *why* a risk level was assigned.
+
+### 💻 Unified Dashboards
+*   **Reception/Triage View:** Quick patient intake with instant priority feedback.
+*   **Doctor Cockpit:** Focused view of pending patients, categorized by medical urgency.
+*   **Admin Analytics:** Data-driven insights into department load and risk distribution.
+
+### 📱 Mobile Excellence
+*   **Mobile-First Design:** Built on the Ionic framework for a premium look and feel.
+*   **Android App:** Fully native Android project generated via Capacitor.
+*   **PWA Ready:** Smooth, app-like experience even in the browser.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python 3.10+
-- **Framework**: FastAPI
-- **Database**: SQLite
-- **ORM**: SQLAlchemy
-- **AI/ML**: Scikit-learn, SHAP, Pandas
-- **Frontend**: HTML, CSS, Vanilla JavaScript
+### Frontend
+- **Framework:** React 18 (TypeScript)
+- **UI:** Ionic Framework (Android & iOS UI Patterns)
+- **State Management:** React Hooks + WebSockets
+- **Visuals:** Chart.js for real-time analytics
+
+### Backend & AI
+- **Framework:** FastAPI (Python 3.10+)
+- **ML Models:** XGBoost Classifier & Logistic Regression
+- **Explainability:** SHAP (Shapley Additive Explanations)
+- **Database:** SQLite (Async via SQLAlchemy 2.0)
+
+### Mobile & DevOps
+- **Mobile runtime:** Capacitor 7.0
+- **Automation:** GitHub Actions (Self-building APK Pipeline)
+
+---
 
 ## 📂 Project Structure
 
-```
-backend/
-├── api/                  # FastAPI endpoints
-├── models/               # SQLAlchemy models
-├── services/             # Business logic & AI services
-├── scripts/              # Utility scripts (training, migration)
-├── data/                 # Datasets and model files
-└── main.py               # Application entry point
-
+```bash
 frontend/
-├── index.html            # Main dashboard
-├── login.html            # Authentication
-├── patient_entry.html    # Patient registration
-└── style.css             # Styling
+├── android/            # Native Android Project files
+├── src/
+│   ├── components/     # High-quality UI components (Navbar, StatsCards)
+│   ├── pages/          # Dashboard views (Admin, Doctor, Triage)
+│   └── api/            # Centralized Axios integration
+├── assets/             # Branding & App Icons
+└── .github/            # Automation (CI/CD)
+
+backend/
+├── services/           # ML Inference and SHAP logic
+├── models/             # Database Schema
+├── main.py             # FastAPI Server Entry
+└── requirements.txt    # Python dependencies
 ```
 
-## ⚙️ Setup & Installation
+---
 
-### Prerequisites
+## ⚙️ Installation & Setup
 
-- Python 3.10+
-- SQLite (local file)
-
-### 1. Install Dependencies
-
+### 1. Backend Setup
 ```bash
-pip install -r backend/requirements.txt
+cd backend
+python -m venv venv
+source venv/bin/activate  # venv\Scripts\activate on Windows
+pip install -r requirements.txt
+python main.py
 ```
 
-### 2. Configure Environment Variables
-
-Create a `.env` file in the `backend/` directory:
-
-```env
-USE_SQLITE=1
-JWT_SECRET=your_jwt_secret
-```
-
-### 3. Run Database Migrations
-
-Apply the database schema:
-
+### 2. Frontend Setup
 ```bash
-python backend/scripts/migrate_schema.py
+cd frontend
+npm install
+npm run dev
 ```
 
-### 4. Train the AI Model
-
-Generate and train the ML model:
-
+### 📱 Mobile App (Android)
+The project is already configured for Android. To build locally:
+1. Ensure you have Android Studio and Java 21 installed.
+2. Run:
 ```bash
-python backend/scripts/train_model.py
+cd frontend
+npm run build
+npx cap sync android
+npx cap open android
 ```
 
-### 5. Start the Server
+---
 
-```bash
-python backend/main.py
-```
+## 🤖 CI/CD Build Pipeline
+We have configured **GitHub Actions** to automatically build your APK. 
+Every time you push code to the `main` branch, a new **Android APK** is generated and available in the **Actions** tab of the repository.
 
-The API will be available at `http://localhost:8000`.
+---
 
-## 🏃 Usage
-
-### 1. Access the Dashboard
-
-Open `frontend/index.html` in your browser.
-
-### 2. Login
-
-- **Username**: `admin`
-- **Password**: `admin123`
-
-### 3. Add Patients
-
-- Click **"Add New Patient"**.
-- Fill in the patient details (Age, Vitals, Symptoms).
-- Click **"Submit"**.
-
-### 4. View Triage Results
-
-The dashboard will automatically display:
-- **Risk Level**: Calculated by the AI model.
-- **Recommended Department**: Where the patient should be sent.
-- **SHAP Explanation**: Why the AI made this decision.
-- **Priority Queue**: Real-time ordering of patients.
-
-## 🧪 Testing
-
-Run the verification script to test the core logic:
-
-```bash
-python backend/scripts/verify_logic_direct.py
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Create a feature branch (`git checkout -b feature/AmazingFeature`).
-2. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-3. Push to the branch (`git push origin feature/AmazingFeature`).
-4. Open a Pull Request.
+## 🤝 Team
+Developed for the Kanini Hackathon. 🩺✨
